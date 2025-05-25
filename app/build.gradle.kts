@@ -60,7 +60,7 @@ dependencies {
     //implementation(libs.androidx.appcompat)
     //implementation(libs.material)
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+    //implementation(libs.androidx.constraintlayout)
     implementation(libs.hilt.android) // << DÒNG NÀY RẤT QUAN TRỌNG
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
@@ -84,10 +84,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
-    // Hilt
-    implementation(libs.hilt.android) // << Đảm bảo dòng này có mặt
-    ksp(libs.hilt.compiler)           // Sử dụng KSP cho Hilt compiler
-    implementation(libs.hilt.navigation.compose)
 
     // Retrofit
     implementation(libs.retrofit.core)
