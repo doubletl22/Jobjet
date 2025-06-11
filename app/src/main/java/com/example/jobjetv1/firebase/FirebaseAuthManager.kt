@@ -1,8 +1,9 @@
 package com.example.jobjetv1.firebase
 
 import android.app.Activity
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
+//import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
@@ -14,7 +15,7 @@ object FirebaseAuthManager {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     fun signInWithGoogle(idToken: String, onResult: (Boolean, Exception?) -> Unit) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        // Tái sử dụng hàm đã có
+        signInWithCredential(credential, onResult)
     }
     /**
      * Gửi mã OTP đến số điện thoại người dùng.
@@ -41,7 +42,7 @@ object FirebaseAuthManager {
         signInWithCredential(credential, onResult)
     }
 
-    private fun signInWithCredential(credential: PhoneAuthCredential, onResult: (Boolean, Exception?) -> Unit) {
+    private fun signInWithCredential(credential: AuthCredential, onResult: (Boolean, Exception?) -> Unit) {
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
