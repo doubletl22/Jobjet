@@ -1,25 +1,22 @@
-package com.example.jobjetv1.firebase
+package com.example.jobjetv1.repository
 
 import android.app.Activity
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
-//import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
-import com.google.firebase.auth.GoogleAuthProvider
 import java.util.concurrent.TimeUnit
 
-object FirebaseAuthManager {
+class AuthRepository {
 
-    //đăng nhập google
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
     fun signInWithGoogle(idToken: String, onResult: (Boolean, Exception?) -> Unit) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         signInWithCredential(credential, onResult)
     }
-    /**
-     * Gửi mã OTP đến số điện thoại người dùng.
-     */
+
     fun sendOtp(
         phoneNumber: String,
         activity: Activity,
@@ -34,9 +31,6 @@ object FirebaseAuthManager {
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
-    /**
-     * Xác thực mã OTP người dùng nhập vào.
-     */
     fun verifyOtp(verificationId: String, code: String, onResult: (Boolean, Exception?) -> Unit) {
         val credential = PhoneAuthProvider.getCredential(verificationId, code)
         signInWithCredential(credential, onResult)

@@ -1,4 +1,4 @@
-package com.example.jobjetv1.ui.loginscreen
+package com.example.jobjetv1.view
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.jobjetv1.logic.OtpEvent
-import com.example.jobjetv1.logic.OtpViewModel
-import com.example.jobjetv1.logic.OtpViewModelFactory
+import com.example.jobjetv1.viewmodel.OtpEvent
+import com.example.jobjetv1.viewmodel.OtpViewModel
+import com.example.jobjetv1.viewmodel.OtpViewModelFactory
 import kotlinx.coroutines.delay
 
 @Composable

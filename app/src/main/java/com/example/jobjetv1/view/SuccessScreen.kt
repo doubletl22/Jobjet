@@ -1,4 +1,4 @@
-package com.example.jobjetv1.ui.loginscreen // Đảm bảo package này khớp với dự án của bạn
+package com.example.jobjetv1.view // Đảm bảo package này khớp với dự án của bạn
 
 // --- THÊM CÁC IMPORT NÀY VÀO ---
 import androidx.compose.foundation.Image

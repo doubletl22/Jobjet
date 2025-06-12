@@ -1,4 +1,4 @@
-package com.example.jobjetv1.data
+package com.example.jobjetv1.model
 
 data class User(
     val uid: String,

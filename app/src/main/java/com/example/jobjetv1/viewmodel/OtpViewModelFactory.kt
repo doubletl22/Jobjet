@@ -1,4 +1,4 @@
-package com.example.jobjetv1.logic
+package com.example.jobjetv1.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

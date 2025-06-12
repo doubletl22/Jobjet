@@ -1,16 +1,14 @@
-package com.example.jobjetv1.logic
+package com.example.jobjetv1.viewmodel
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
-//import androidx.lifecycle.viewModelScope
-import com.example.jobjetv1.firebase.FirebaseAuthManager
+import com.example.jobjetv1.repository.AuthRepository
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-//import kotlinx.coroutines.launch
 
-// Lớpsealed để quản lý các sự kiện điều hướng hoặc hiển thị lỗi
+// Lớp sealed để quản lý các sự kiện điều hướng hoặc hiển thị lỗi
 sealed class LoginEvent {
     data class NavigateToOtp(val verificationId: String) : LoginEvent()
     data class ShowError(val message: String) : LoginEvent()
@@ -19,6 +17,8 @@ sealed class LoginEvent {
 }
 
 class LoginViewModel : ViewModel() {
+
+    private val authRepository = AuthRepository()
 
     private val _phoneNumber = MutableStateFlow("")
     val phoneNumber = _phoneNumber.asStateFlow()
@@ -31,7 +31,7 @@ class LoginViewModel : ViewModel() {
 
     fun signInWithGoogle(idToken: String) {
         _isLoading.value = true
-        FirebaseAuthManager.signInWithGoogle(idToken) { isSuccess, exception ->
+        authRepository.signInWithGoogle(idToken) { isSuccess, exception ->
             _isLoading.value = false
             if (isSuccess) {
                 _event.value = LoginEvent.VerificationCompleted
@@ -40,7 +40,6 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-
 
     fun onPhoneNumberChanged(newNumber: String) {
         _phoneNumber.value = newNumber
@@ -58,13 +57,11 @@ class LoginViewModel : ViewModel() {
 
         val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                // Tự động xác thực thành công (hiếm gặp, ví dụ trên cùng thiết bị)
                 _isLoading.value = false
                 _event.value = LoginEvent.VerificationCompleted
             }
 
             override fun onVerificationFailed(e: com.google.firebase.FirebaseException) {
-                // Xác thực thất bại
                 _isLoading.value = false
                 _event.value = LoginEvent.ShowError("Lỗi: ${e.localizedMessage}")
             }
@@ -73,15 +70,13 @@ class LoginViewModel : ViewModel() {
                 verificationId: String,
                 token: PhoneAuthProvider.ForceResendingToken,
             ) {
-                // Mã đã được gửi, chuyển sang màn hình OTP
                 _isLoading.value = false
                 _event.value = LoginEvent.NavigateToOtp(verificationId)
             }
         }
-        FirebaseAuthManager.sendOtp(fullPhoneNumber, activity, callbacks)
+        authRepository.sendOtp(fullPhoneNumber, activity, callbacks)
     }
 
-    // Hàm để reset trạng thái sự kiện sau khi đã xử lý
     fun onEventHandled() {
         _event.value = LoginEvent.Idle
     }

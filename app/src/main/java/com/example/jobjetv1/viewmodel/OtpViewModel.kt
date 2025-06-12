@@ -1,7 +1,7 @@
-package com.example.jobjetv1.logic
+package com.example.jobjetv1.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.jobjetv1.firebase.FirebaseAuthManager
+import com.example.jobjetv1.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -14,6 +14,8 @@ sealed class OtpEvent {
 
 class OtpViewModel(private val verificationId: String) : ViewModel() {
 
+    private val authRepository = AuthRepository()
+
     private val _otpCode = MutableStateFlow("")
     val otpCode = _otpCode.asStateFlow()
 
@@ -24,7 +26,6 @@ class OtpViewModel(private val verificationId: String) : ViewModel() {
     val event = _event.asStateFlow()
 
     fun onOtpCodeChanged(newCode: String) {
-        // Chỉ cho phép nhập tối đa 6 chữ số
         if (newCode.length <= 6) {
             _otpCode.value = newCode
         }
@@ -37,7 +38,7 @@ class OtpViewModel(private val verificationId: String) : ViewModel() {
         }
 
         _isLoading.value = true
-        FirebaseAuthManager.verifyOtp(verificationId, otpCode.value) { isSuccess, exception ->
+        authRepository.verifyOtp(verificationId, otpCode.value) { isSuccess, exception ->
             _isLoading.value = false
             if (isSuccess) {
                 _event.value = OtpEvent.NavigateToSuccess
