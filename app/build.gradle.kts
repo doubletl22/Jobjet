@@ -33,6 +33,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -61,6 +62,12 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.56.2")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation ("com.google.firebase:firebase-auth-ktx")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
+
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

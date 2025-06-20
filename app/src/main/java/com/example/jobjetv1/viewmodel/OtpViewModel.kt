@@ -1,54 +1,108 @@
 package com.example.jobjetv1.viewmodel
 
+import android.app.Activity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.jobjetv1.repository.AuthRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.example.jobjetv1.data.model.AuthUiState
+import com.google.firebase.FirebaseException
+import com.google.firebase.auth.*
+import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 
-// Sự kiện cho màn hình OTP
-sealed class OtpEvent {
-    object NavigateToSuccess : OtpEvent()
-    data class ShowError(val message: String) : OtpEvent()
-    object Idle : OtpEvent()
-}
+class OtpViewModel : ViewModel() {
+    var uiState by mutableStateOf(AuthUiState())
+        private set
 
-class OtpViewModel(private val verificationId: String) : ViewModel() {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private var resendJob: Job? = null
 
-    private val authRepository = AuthRepository()
-
-    private val _otpCode = MutableStateFlow("")
-    val otpCode = _otpCode.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    private val _event = MutableStateFlow<OtpEvent>(OtpEvent.Idle)
-    val event = _event.asStateFlow()
-
-    fun onOtpCodeChanged(newCode: String) {
-        if (newCode.length <= 6) {
-            _otpCode.value = newCode
-        }
+    fun onPhoneChanged(newPhone: String) {
+        uiState = uiState.copy(phone = newPhone)
+    }
+    fun onOtpChanged(newOtp: String) {
+        uiState = uiState.copy(otp = newOtp)
     }
 
-    fun verifyOtp() {
-        if (otpCode.value.length < 6) {
-            _event.value = OtpEvent.ShowError("Vui lòng nhập đủ 6 chữ số.")
+    fun sendOtp(
+        activity: Activity,
+        onCodeSent: (() -> Unit)? = null,
+        onFailed: ((String) -> Unit)? = null
+    ) {
+        uiState = uiState.copy(isLoading = true, errorMessage = null)
+        val options = PhoneAuthOptions.newBuilder(auth)
+            .setPhoneNumber(uiState.phone)
+            .setTimeout(60L, TimeUnit.SECONDS)
+            .setActivity(activity)
+            .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                    // Auto complete (hiếm khi dùng ở VN)
+                }
+                override fun onVerificationFailed(e: FirebaseException) {
+                    uiState = uiState.copy(isLoading = false, errorMessage = e.localizedMessage)
+                    onFailed?.invoke(e.localizedMessage ?: "Gửi OTP thất bại")
+                }
+                override fun onCodeSent(verificationId: String, token: PhoneAuthProvider.ForceResendingToken) {
+                    uiState = uiState.copy(
+                        isOtpSent = true,
+                        isLoading = false,
+                        verificationId = verificationId,
+                        errorMessage = null
+                    )
+                    onCodeSent?.invoke()
+                    startResendTimer()
+                }
+            })
+            .build()
+        PhoneAuthProvider.verifyPhoneNumber(options)
+    }
+
+    // Xác thực OTP
+    fun verifyOtp(
+        onSuccess: () -> Unit,
+        onError: ((String) -> Unit)? = null
+    ) {
+        val id = uiState.verificationId
+        val code = uiState.otp
+        if (id.isNullOrBlank() || code.length < 4) {
+            onError?.invoke("Thiếu mã xác thực")
             return
         }
+        uiState = uiState.copy(isLoading = true, errorMessage = null)
+        val credential = PhoneAuthProvider.getCredential(id, code)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                uiState = uiState.copy(isLoading = false)
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    val msg = task.exception?.localizedMessage ?: "Mã OTP không đúng hoặc đã hết hạn."
+                    uiState = uiState.copy(errorMessage = msg)
+                    onError?.invoke(msg)
+                }
+            }
+    }
 
-        _isLoading.value = true
-        authRepository.verifyOtp(verificationId, otpCode.value) { isSuccess, exception ->
-            _isLoading.value = false
-            if (isSuccess) {
-                _event.value = OtpEvent.NavigateToSuccess
-            } else {
-                _event.value = OtpEvent.ShowError(exception?.message ?: "Mã OTP không hợp lệ.")
+    // Đếm ngược gửi lại OTP
+    var resendSeconds by mutableStateOf(59)
+        private set
+
+    private fun startResendTimer() {
+        resendJob?.cancel()
+        resendSeconds = 59
+        resendJob = CoroutineScope(Dispatchers.Main).launch {
+            while (resendSeconds > 0) {
+                delay(1000)
+                resendSeconds--
             }
         }
     }
 
-    fun onEventHandled() {
-        _event.value = OtpEvent.Idle
+    fun resendOtp(
+        activity: Activity,
+        onResend: (() -> Unit)? = null
+    ) {
+        sendOtp(activity, onCodeSent = onResend)
     }
 }
