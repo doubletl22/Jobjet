@@ -71,6 +71,16 @@ fun LoginScreen(
             Text("TIẾP TỤC", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
         Spacer(Modifier.height(16.dp))
+
+        Text(
+            "Hoặc",
+            color = Color.Gray,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+
+        Spacer(Modifier.height(16.dp))
+
         OutlinedButton(
             onClick = onGoogleLogin,
             modifier = Modifier.fillMaxWidth().height(48.dp)
