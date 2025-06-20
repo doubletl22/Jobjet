@@ -1,11 +1,14 @@
 package com.example.jobjetv1.viewmodel
 
 import android.app.Activity
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.jobjetv1.data.model.AuthUiState
+import com.example.jobjetv1.data.prefs.UserPrefs
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.*
 import kotlinx.coroutines.*
@@ -105,4 +108,13 @@ class OtpViewModel : ViewModel() {
     ) {
         sendOtp(activity, onCodeSent = onResend)
     }
+    fun onLoginSuccess(context: Context, onNavigateHome: () -> Unit) {
+        viewModelScope.launch {
+            UserPrefs.setLoggedIn(context, true)
+            // Lưu thêm thông tin khác nếu cần, ví dụ số điện thoại
+            // UserPrefs.setPhone(context, uiState.phone)
+            onNavigateHome()
+        }
+    }
+
 }
