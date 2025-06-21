@@ -13,6 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import com.example.jobjetv1.viewmodel.AuthViewModel
 import com.example.jobjetv1.R
+import com.example.jobjetv1.ui.theme.Blue
+import com.example.jobjetv1.ui.theme.BlueLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +46,13 @@ fun LoginScreen(
             onValueChange = { viewModel.onPhoneChanged(it) },
             label = { Text("Nhập số điện thoại của bạn") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors( // Hoặc TextFieldDefaults nếu bạn đang dùng Material2
+                focusedBorderColor = Blue,
+                unfocusedBorderColor = Color.Gray,
+                cursorColor = Blue,
+                focusedLabelColor = Blue,     // Màu label khi TextField được focus
+            )
         )
         Spacer(Modifier.height(18.dp))
         Button(
@@ -58,9 +66,14 @@ fun LoginScreen(
                 )
             },
             enabled = state.phone.length >= 10 && !state.isLoading,
-            modifier = Modifier.fillMaxWidth().height(48.dp)
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+            containerColor = Blue, // Màu nền của nút khi kích hoạt
+            contentColor = Color.White, // Màu văn bản/biểu tượng trên nút khi kích hoạt
+            disabledContainerColor = BlueLight, // Màu nền của nút khi bị vô hiệu hóa
+            disabledContentColor = Color.Gray )// Màu văn bản/biểu tượng trên nút khi bị vô hiệu hóa
         ) {
-            Text("TIẾP TỤC", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text("TIẾP TỤC", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
         }
         if (state.isLoading) CircularProgressIndicator(Modifier.padding(top = 16.dp))
         state.errorMessage?.let { Text(it, color = Color.Red, modifier = Modifier.padding(top = 12.dp)) }

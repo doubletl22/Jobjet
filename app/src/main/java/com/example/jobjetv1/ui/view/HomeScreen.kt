@@ -3,6 +3,8 @@ package com.example.jobjetv1.ui.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn // Import LazyColumn
+import androidx.compose.foundation.lazy.items // Import items cho LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -12,10 +14,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.example.jobjetv1.viewmodel.HomeViewModel
 import com.example.jobjetv1.data.model.Job
 import com.example.jobjetv1.R
+import com.example.jobjetv1.ui.theme.Blue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,27 +46,41 @@ fun HomeScreen(
             BottomNavBar(selectedIndex = selectedTab, onTabSelected = onTabSelected)
         }
     ) { paddingValues ->
-        Column(
-            Modifier
+        // Sử dụng LazyColumn thay vì Column thông thường
+        LazyColumn( // Thay thế Column bằng LazyColumn
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp) // Áp dụng spacing cho LazyColumn
         ) {
-            Spacer(Modifier.height(16.dp))
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
-                placeholder = { Text("Tìm kiếm công việc...") },
-                leadingIcon = { Icon(painterResource(id = R.drawable.outline_search_24), null) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            )
-            Spacer(Modifier.height(16.dp))
-            Text("Việc làm gợi ý cho bạn", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                jobs.forEach { job ->
-                    JobCardM3(job)
-                }
+            item { // Thêm các phần tử không phải là item của danh sách vào đây
+                Spacer(Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    placeholder = { Text("Tìm kiếm công việc...") },
+                    leadingIcon = { Icon(painterResource(id = R.drawable.outline_search_24), null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors( // Hoặc TextFieldDefaults nếu bạn đang dùng Material2
+                        focusedBorderColor = Blue,
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Blue,
+                        focusedLabelColor = Blue,     // Màu label khi TextField được focus
+                    )
+                )
+                Spacer(Modifier.height(16.dp))
+                Text("Việc làm gợi ý cho bạn", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            }
+
+            // Sử dụng items để hiển thị danh sách Job
+            items(jobs, key = { it.id }) { job -> // Giả sử Job có thuộc tính 'id' duy nhất
+                JobCardM3(job)
+            }
+
+            item { // Thêm các phần tử cuối cùng nếu có
+                Spacer(Modifier.height(10.dp))
             }
         }
     }
@@ -97,9 +115,25 @@ fun JobCardM3(job: Job) {
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(job.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(job.address, color = Color.Gray, fontSize = 13.sp)
-                Text(job.description, color = Color.Gray, fontSize = 13.sp)
+                Text(
+                    job.title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = job.address,
+                    color = Color.Gray,
+                    fontSize = 13.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = job.description,
+                    color = Color.Gray,
+                    fontSize = 13.sp,
+                    maxLines = 1, // Giới hạn chỉ 1 dòng
+                    overflow = TextOverflow.Ellipsis // Hiển thị dấu ... nếu tràn
+                )
                 Spacer(Modifier.height(4.dp))
                 Text(job.wage, color = job.wageColor, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             }

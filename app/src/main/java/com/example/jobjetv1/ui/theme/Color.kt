@@ -16,3 +16,5 @@ val DarkText = Color(0xFF1C1C1E)   // Màu cho văn bản chính
 // (Tùy chọn) Bạn có thể giữ lại các màu cho Dark Theme nếu muốn hỗ trợ cả hai
 // val Navy = Color(0xFF000080)
 // val Chartreuse = Color(0xFFEFF7CF)
+val Blue = Color(0xFF2196F3) // Màu 2196F3
+val BlueLight = Color(0xFF64B5F6)
