@@ -101,26 +101,21 @@ fun ProfileScreen(
                 // Progress
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    CircularProgressIndicator(
-                        progress = profile.progress / 100f,
-                        color = Color(0xFF2196F3),
-                        trackColor = Color(0xFFE3E3E3),
-                        modifier = Modifier.size(46.dp),
-                        strokeWidth = 5.dp
-                    )
                     Spacer(Modifier.width(15.dp))
-                    Column {
-                        Text("Hoàn thiện hồ sơ của bạn", fontWeight = FontWeight.Medium, fontSize = 15.sp)
-                        Button(
-                            onClick = onUpdateProfile,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 3.dp),
-                            modifier = Modifier.height(30.dp)
-                        ) {
-                            Text("Cập nhật", fontSize = 13.sp, color = Color.White, fontWeight = FontWeight.Bold)
-                        }
+                    Text("Hoàn thiện hồ sơ của bạn", fontWeight = FontWeight.Medium, fontSize = 15.sp)
+
+                    Button(
+                        onClick = onUpdateProfile,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 3.dp),
+                        modifier = Modifier
+                            .height(30.dp)
+                            .weight(1f, fill = false)
+                    ) {
+                        Text("Cập nhật", fontSize = 13.sp, color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
                 Spacer(Modifier.height(15.dp))

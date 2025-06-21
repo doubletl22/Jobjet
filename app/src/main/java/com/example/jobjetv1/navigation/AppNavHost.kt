@@ -70,6 +70,7 @@ fun AppNavHost() {
             composable("profile") {
                 ProfileScreen(
                     onRecruitClick = { navController.navigate("recruitment_post") },
+                    onEditProfile = { navController.navigate("edit_profile") },
                     onTabSelected = {
                         when(it) {
                             0 -> navController.navigate("home") { launchSingleTop = true }
@@ -96,6 +97,25 @@ fun AppNavHost() {
                     onSubmit = { /* Gửi API hoặc lưu lên server */ }
                 )
             }
+            composable("edit_profile") {
+                EditProfileScreen(
+                    onChangeAvatar = { navController.navigate("edit_avatar") },
+                    onBack = { navController.popBackStack() },
+                    onDone = { /* lưu lại và popBackStack() */ },
+                    onDelete = { /* xử lý xoá hồ sơ */ },
+                    onFieldClick = { field ->
+                    }
+                )
+            }
+            composable("edit_avatar") {
+                EditAvatarScreen(
+                    onBack = { navController.popBackStack() },
+                    onTakePhoto = { /* mở camera */ },
+                    onPickGallery = { /* mở thư viện */ },
+                    onDeletePhoto = { /* xóa avatar */ }
+                )
+            }
+
         }
     }
 }
