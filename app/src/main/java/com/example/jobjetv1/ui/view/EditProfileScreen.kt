@@ -23,6 +23,7 @@ fun EditProfileScreen(
     onDone: () -> Unit = {},
     onDelete: () -> Unit = {},
     onChangeAvatar: () -> Unit = {},
+    onChangeNumberPhone: () -> Unit = {},
     onFieldClick: (String) -> Unit = {},
 ) {
     var state by remember { mutableStateOf(uiState) }
@@ -57,9 +58,12 @@ fun EditProfileScreen(
                 value = state.name,
                 onClick = onChangeAvatar
             )
+            ProfileEditItem(
+                label = "Số điện thoại",
+                value = state.phone,
+                onClick = onChangeNumberPhone
+            )
 
-
-            ProfileEditItem("Số điện thoại", state.phone) { onFieldClick("phone") }
             ProfileEditItem("CCCD", state.idCard) { onFieldClick("idCard") }
             ProfileEditItem("Ngày sinh", state.birth) { onFieldClick("birth") }
             ProfileEditItem("Giới tính", state.gender) { onFieldClick("gender") }

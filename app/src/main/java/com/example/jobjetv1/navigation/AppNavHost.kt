@@ -2,6 +2,8 @@ package com.example.jobjetv1.navigation
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.activity
 import androidx.navigation.compose.*
 import com.example.jobjetv1.data.prefs.UserPrefs
 import com.example.jobjetv1.ui.view.loginscreen.*
@@ -100,6 +102,7 @@ fun AppNavHost() {
             composable("edit_profile") {
                 EditProfileScreen(
                     onChangeAvatar = { navController.navigate("edit_avatar") },
+                    onChangeNumberPhone = { navController.navigate("change_phone") },
                     onBack = { navController.popBackStack() },
                     onDone = { /* lưu lại và popBackStack() */ },
                     onDelete = { /* xử lý xoá hồ sơ */ },
@@ -115,6 +118,31 @@ fun AppNavHost() {
                     onDeletePhoto = { /* xóa avatar */ }
                 )
             }
+            composable("change_phone") {
+                val otpViewModel: OtpViewModel = viewModel()
+                ChangePhoneScreen(
+                    viewModel = otpViewModel,
+                    currentPhone = "0912 345 678",
+                    onBack = { navController.popBackStack() },
+                    onOtpSent = { navController.navigate("otp/change_phone") }
+                )
+            }
+
+            composable("otp/change_phone") {
+                val otpViewModel: OtpViewModel = viewModel()
+                OtpChangePhoneScreen(
+                    viewModel = otpViewModel,
+                    phone = otpViewModel.uiState.phone,
+                    onBack = { navController.popBackStack() },
+                    onOtpSuccess = {
+                        navController.popBackStack("edit_profile", inclusive = false)
+                    }
+                )
+            }
+
+
+
+
 
         }
     }
