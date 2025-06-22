@@ -44,8 +44,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = state.phone,
             onValueChange = { viewModel.onPhoneChanged(it) },
-            leadingIcon = { Text("+84", color = Color.Gray, fontSize = 16.sp) },
-            placeholder = { Text("Nhập số điện thoại của bạn") },
+            label = { Text("Nhập số điện thoại của bạn") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors( // Hoặc TextFieldDefaults nếu bạn đang dùng Material2

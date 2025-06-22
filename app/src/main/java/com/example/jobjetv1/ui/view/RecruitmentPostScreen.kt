@@ -20,17 +20,22 @@ import androidx.compose.ui.unit.*
 import com.example.jobjetv1.R
 import com.example.jobjetv1.data.model.JobPostUiState
 import com.example.jobjetv1.data.model.WorkType
+import com.example.jobjetv1.viewmodel.RecruitmentViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecruitmentPostScreen(
+    viewModel: RecruitmentViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     onBack: () -> Unit = {},
     onSubmit: (JobPostUiState) -> Unit = {}
 ) {
-    var state by remember { mutableStateOf(JobPostUiState()) }
+    val state = viewModel.jobPostState
+    val validationState = viewModel.validationState
+    val isSubmitting = viewModel.isSubmitting
     val scrollState = rememberScrollState()
     val wageUnits = listOf("VND/giờ", "VND/tháng", "USD/giờ")
     var expanded by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
@@ -57,19 +62,19 @@ fun RecruitmentPostScreen(
                 Column {
                     OutlinedTextField(
                         value = state.companyName,
-                        onValueChange = { state = state.copy(companyName = it) },
+                        onValueChange = { viewModel.updateJobPost { copy(companyName = it) } },
                         label = { Text("Tên công ty") },
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = state.jobTitle,
-                        onValueChange = { state = state.copy(jobTitle = it) },
+                        onValueChange = { viewModel.updateJobPost { copy(jobTitle = it) } },
                         label = { Text("Tên công việc") },
                         modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
                     )
                     OutlinedTextField(
                         value = state.quantity,
-                        onValueChange = { state = state.copy(quantity = it) },
+                        onValueChange = { viewModel.updateJobPost { copy(quantity = it) } },
                         label = { Text("Số lượng") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
@@ -82,13 +87,13 @@ fun RecruitmentPostScreen(
                         Spacer(Modifier.width(12.dp))
                         RadioButton(
                             selected = state.workType == WorkType.FULL_TIME,
-                            onClick = { state = state.copy(workType = WorkType.FULL_TIME) }
+                            onClick = { viewModel.updateJobPost { copy(workType = WorkType.FULL_TIME) } }
                         )
                         Text("Toàn thời gian", fontSize = 14.sp)
                         Spacer(Modifier.width(12.dp))
                         RadioButton(
                             selected = state.workType == WorkType.PART_TIME,
-                            onClick = { state = state.copy(workType = WorkType.PART_TIME) }
+                            onClick = { viewModel.updateJobPost { copy(workType = WorkType.PART_TIME) } }
                         )
                         Text("Bán thời gian", fontSize = 14.sp)
                     }
@@ -98,7 +103,7 @@ fun RecruitmentPostScreen(
                     ) {
                         OutlinedTextField(
                             value = state.wage,
-                            onValueChange = { state = state.copy(wage = it) },
+                            onValueChange = { viewModel.updateJobPost { copy(wage = it) } },
                             label = { Text("Mức lương") },
                             modifier = Modifier.weight(1f)
                         )
@@ -118,7 +123,7 @@ fun RecruitmentPostScreen(
                                     DropdownMenuItem(
                                         text = { Text(unit) },
                                         onClick = {
-                                            state = state.copy(wageUnit = unit)
+                                            viewModel.updateJobPost { copy(wageUnit = unit) }
                                             expanded = false
                                         }
                                     )
@@ -133,7 +138,7 @@ fun RecruitmentPostScreen(
             CardSection("Mô tả công việc") {
                 OutlinedTextField(
                     value = state.description,
-                    onValueChange = { state = state.copy(description = it) },
+                    onValueChange = { viewModel.updateJobPost { copy(description = it) } },
                     label = { Text("Mô tả chi tiết về công việc...") },
                     modifier = Modifier.fillMaxWidth().height(95.dp),
                     maxLines = 4,
@@ -144,7 +149,7 @@ fun RecruitmentPostScreen(
             CardSection("Yêu cầu ứng viên") {
                 OutlinedTextField(
                     value = state.requirement,
-                    onValueChange = { state = state.copy(requirement = it) },
+                    onValueChange = { viewModel.updateJobPost { copy(requirement = it) } },
                     label = { Text("Yêu cầu nhân viên...") },
                     modifier = Modifier.fillMaxWidth().height(75.dp),
                     maxLines = 3,
@@ -155,7 +160,7 @@ fun RecruitmentPostScreen(
             CardSection("Nội quy công việc") {
                 OutlinedTextField(
                     value = state.rule,
-                    onValueChange = { state = state.copy(rule = it) },
+                    onValueChange = { viewModel.updateJobPost { copy(rule = it) } },
                     label = { Text("Mô tả nội quy") },
                     modifier = Modifier.fillMaxWidth().height(75.dp),
                     maxLines = 3,
@@ -166,7 +171,7 @@ fun RecruitmentPostScreen(
             CardSection("Địa điểm làm việc") {
                 OutlinedTextField(
                     value = state.address,
-                    onValueChange = { state = state.copy(address = it) },
+                    onValueChange = { viewModel.updateJobPost { copy(address = it) } },
                     leadingIcon = {
                         Icon(
                             painterResource(R.drawable.outline_location_on_24),
@@ -192,19 +197,19 @@ fun RecruitmentPostScreen(
             CardSection("Thông tin liên hệ") {
                 OutlinedTextField(
                     value = state.contactName,
-                    onValueChange = { state = state.copy(contactName = it) },
+                    onValueChange = { viewModel.updateJobPost { copy(contactName = it) } },
                     label = { Text("Tên người liên hệ") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = state.contactEmail,
-                    onValueChange = { state = state.copy(contactEmail = it) },
+                    onValueChange = { viewModel.updateJobPost { copy(contactEmail = it) } },
                     label = { Text("Email") },
                     modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
                 )
                 OutlinedTextField(
                     value = state.contactPhone,
-                    onValueChange = { state = state.copy(contactPhone = it) },
+                    onValueChange = { viewModel.updateJobPost { copy(contactPhone = it) } },
                     label = { Text("Số điện thoại") },
                     modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
@@ -213,7 +218,21 @@ fun RecruitmentPostScreen(
             Spacer(Modifier.height(15.dp))
             // Nút đăng tuyển
             Button(
-                onClick = { onSubmit(state) },
+                onClick = { 
+                    android.util.Log.d("RecruitmentPostScreen", "Submit button clicked")
+                    errorMessage = null // Clear previous error
+                    viewModel.validateAndSubmit(
+                        onSuccess = { jobPost ->
+                            android.util.Log.d("RecruitmentPostScreen", "Job submitted successfully: ${jobPost.jobTitle}")
+                            onSubmit(jobPost)
+                        },
+                        onError = { error ->
+                            android.util.Log.d("RecruitmentPostScreen", "Job submission failed: $error")
+                            errorMessage = error
+                        }
+                    )
+                },
+                enabled = !isSubmitting,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
@@ -221,8 +240,29 @@ fun RecruitmentPostScreen(
                 shape = RoundedCornerShape(11.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
             ) {
-                Text("Đăng tuyển ngay", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                if (isSubmitting) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Đang đăng bài...", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                } else {
+                    Text("Đăng tuyển ngay", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                }
             }
+            
+            // Hiển thị error message nếu có
+            errorMessage?.let { error ->
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+            }
+            
             Spacer(Modifier.height(20.dp))
         }
     }

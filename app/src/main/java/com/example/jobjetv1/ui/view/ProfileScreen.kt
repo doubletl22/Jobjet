@@ -12,6 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,15 +25,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
+import android.util.Log
 import coil.compose.rememberAsyncImagePainter
 import com.example.jobjetv1.data.model.ProfileUiState
 import com.example.jobjetv1.data.model.SavedJob
+import com.example.jobjetv1.viewmodel.SavedJobsViewModel
 import com.example.jobjetv1.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     profile: ProfileUiState = ProfileUiState(),
+    savedJobsViewModel: SavedJobsViewModel? = null,
     onEditProfile: () -> Unit = {},
     onUpdateProfile: () -> Unit = {},
     onRecruitClick: () -> Unit = {},
@@ -43,7 +48,9 @@ fun ProfileScreen(
     onSeeHistory: () -> Unit = {},
     onChangeMainBank: () -> Unit = {},
     selectedTab: Int = 2,
-    onTabSelected: (Int) -> Unit = {}
+    onTabSelected: (Int) -> Unit = {},
+    // Thêm tham số cho saved jobs mới
+    onSavedJobsClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -101,21 +108,26 @@ fun ProfileScreen(
                 // Progress
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    CircularProgressIndicator(
+                        progress = profile.progress / 100f,
+                        color = Color(0xFF2196F3),
+                        trackColor = Color(0xFFE3E3E3),
+                        modifier = Modifier.size(46.dp),
+                        strokeWidth = 5.dp
+                    )
                     Spacer(Modifier.width(15.dp))
-                    Text("Hoàn thiện hồ sơ của bạn", fontWeight = FontWeight.Medium, fontSize = 15.sp)
-
-                    Button(
-                        onClick = onUpdateProfile,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 3.dp),
-                        modifier = Modifier
-                            .height(30.dp)
-                            .weight(1f, fill = false)
-                    ) {
-                        Text("Cập nhật", fontSize = 13.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                    Column {
+                        Text("Hoàn thiện hồ sơ của bạn", fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                        Button(
+                            onClick = onUpdateProfile,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 3.dp),
+                            modifier = Modifier.height(30.dp)
+                        ) {
+                            Text("Cập nhật", fontSize = 13.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
                 Spacer(Modifier.height(15.dp))
@@ -134,6 +146,59 @@ fun ProfileScreen(
                             .padding(15.dp)
                     ) {
                         Text("Đăng bài tuyển dụng", color = Color(0xFF4A4A4A), fontWeight = FontWeight.Medium)
+                    }
+                }
+                Spacer(Modifier.height(13.dp))
+            }
+
+            item {
+                // Việc làm đã lưu
+                val savedJobsCount = savedJobsViewModel?.getSavedJobsCount() ?: 0
+                
+                // Debug log để kiểm tra reactivity
+                LaunchedEffect(savedJobsCount) {
+                    Log.d("ProfileScreen", "Saved jobs count updated: $savedJobsCount")
+                }
+                
+                Card(
+                    shape = RoundedCornerShape(13.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        Modifier
+                            .clickable { onSavedJobsClick() }
+                            .padding(15.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Bookmark,
+                            contentDescription = null,
+                            tint = Color(0xFF2196F3),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "Việc làm đã lưu", 
+                                color = Color(0xFF4A4A4A), 
+                                fontWeight = FontWeight.Medium
+                            )
+                            if (savedJobsCount > 0) {
+                                Text(
+                                    "$savedJobsCount việc làm đã lưu",
+                                    color = Color.Gray,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                        Icon(
+                            Icons.Default.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                 }
                 Spacer(Modifier.height(13.dp))
@@ -248,6 +313,13 @@ fun ProfileScreen(
 
             item {
                 // Việc làm đã lưu - Phần đầu của Card
+                val savedJobsCount = savedJobsViewModel?.getSavedJobsCount() ?: 0
+                
+                // Debug log để kiểm tra reactivity
+                LaunchedEffect(savedJobsCount) {
+                    Log.d("ProfileScreen", "Second card - Saved jobs count updated: $savedJobsCount")
+                }
+                
                 Card(
                     shape = RoundedCornerShape(13.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
@@ -260,8 +332,12 @@ fun ProfileScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text("Việc làm đã lưu", fontWeight = FontWeight.Medium)
-                            TextButton(onClick = onSeeAllSavedJobs, contentPadding = PaddingValues(0.dp)) {
-                                Text("Xem tất cả", fontSize = 14.sp, color = Color(0xFF2196F3))
+                            if (savedJobsCount > 0) {
+                                TextButton(onClick = onSeeAllSavedJobs, contentPadding = PaddingValues(0.dp)) {
+                                    Text("$savedJobsCount việc làm", fontSize = 14.sp, color = Color(0xFF2196F3))
+                                }
+                            } else {
+                                Text("Chưa có việc làm nào", fontSize = 14.sp, color = Color.Gray)
                             }
                         }
                         // Thêm Spacer hoặc tách riêng để quản lý khoảng cách nếu cần
@@ -270,26 +346,39 @@ fun ProfileScreen(
             }
 
             // Danh sách các việc làm đã lưu
-            // Đảm bảo savedJobs trong ProfileUiState có một thuộc tính ID duy nhất để dùng làm key
-            items(profile.savedJobs)  { job -> // Giả định SavedJob có thuộc tính 'id'
-                // Do đã có Card bên ngoài bao bọc, nên chỉ cần Row cho mỗi item
-                // Nếu bạn muốn mỗi SavedJob là một Card riêng, thì hãy đặt Card ở đây
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onSavedJobClick(job) }
-                        .padding(horizontal = 14.dp, vertical = 6.dp) // Padding riêng cho từng item
-                ) {
-                    Icon(painterResource(R.drawable.outline_person_24), contentDescription = null, tint = Color(0xFF2196F3), modifier = Modifier.size(24.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(job.title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                        Text(job.company, color = Color.Gray, fontSize = 13.sp)
-                        Text(job.address, color = Color.Gray, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            savedJobsViewModel?.let { viewModel ->
+                items(viewModel.savedJobs, key = { it.id }) { job ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { 
+                                // Navigate to job detail - cần convert Job to SavedJob hoặc xử lý khác
+                                // onSavedJobClick(job) 
+                            }
+                            .padding(horizontal = 14.dp, vertical = 6.dp)
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.outline_person_24), 
+                            contentDescription = null, 
+                            tint = Color(0xFF2196F3), 
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(job.title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text(job.address, color = Color.Gray, fontSize = 13.sp)
+                            Text(
+                                job.description, 
+                                color = Color.Gray, 
+                                fontSize = 13.sp, 
+                                maxLines = 1, 
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Text(job.wage, color = job.wageColor, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
-                    Spacer(Modifier.width(8.dp))
-                    Text(job.wage, color = Color(0xFF43A047), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 }
             }
             // Nếu bạn muốn có một Card riêng cho các savedJobs và chúng nằm trong đó,

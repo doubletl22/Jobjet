@@ -2,13 +2,16 @@ package com.example.jobjetv1.ui.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn // Import LazyColumn
 import androidx.compose.foundation.lazy.items // Import items cho LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
@@ -17,7 +20,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
+import android.util.Log
 import com.example.jobjetv1.viewmodel.HomeViewModel
+import com.example.jobjetv1.viewmodel.SavedJobsViewModel
 import com.example.jobjetv1.data.model.Job
 import com.example.jobjetv1.R
 import com.example.jobjetv1.ui.theme.Blue
@@ -26,14 +31,25 @@ import com.example.jobjetv1.ui.theme.Blue
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    savedJobsViewModel: SavedJobsViewModel? = null,
     selectedTab: Int,
-    onTabSelected: (Int) -> Unit
+    onTabSelected: (Int) -> Unit,
+    onJobClick: (Job) -> Unit = {}
 ) {
     var searchText by remember { mutableStateOf("") }
-    val jobs = viewModel.jobs.filter {
-        it.title.contains(searchText, true) ||
-                it.address.contains(searchText, true) ||
-                it.description.contains(searchText, true)
+    
+    // Observer jobs changes for debugging
+    viewModel.ObserveJobsChanges()
+    
+    // Reactive jobs list - sẽ tự động recompose khi jobs thay đổi
+    val allJobs by remember { derivedStateOf { viewModel.jobs } }
+    
+    val jobs = remember(allJobs, searchText) {
+        allJobs.filter {
+            it.title.contains(searchText, true) ||
+                    it.address.contains(searchText, true) ||
+                    it.description.contains(searchText, true)
+        }
     }
 
     Scaffold(
@@ -72,12 +88,16 @@ fun HomeScreen(
                     )
                 )
                 Spacer(Modifier.height(16.dp))
-                Text("Việc làm gợi ý cho bạn", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Việc làm gợi ý cho bạn (${jobs.size})", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
 
             // Sử dụng items để hiển thị danh sách Job
             items(jobs, key = { it.id }) { job -> // Giả sử Job có thuộc tính 'id' duy nhất
-                JobCardM3(job)
+                JobCardM3(
+                    job = job, 
+                    onJobClick = onJobClick,
+                    savedJobsViewModel = savedJobsViewModel
+                )
             }
 
             item { // Thêm các phần tử cuối cùng nếu có
@@ -88,12 +108,18 @@ fun HomeScreen(
 }
 
 @Composable
-fun JobCardM3(job: Job) {
+fun JobCardM3(
+    job: Job, 
+    onJobClick: (Job) -> Unit = {},
+    savedJobsViewModel: SavedJobsViewModel? = null
+) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onJobClick(job) }
     ) {
         Row(
             Modifier
@@ -139,8 +165,43 @@ fun JobCardM3(job: Job) {
                 Text(job.wage, color = job.wageColor, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             }
             Spacer(Modifier.width(8.dp))
+            
+            // Nút Lưu việc làm
+            savedJobsViewModel?.let { viewModel ->
+                val isJobSaved = viewModel.isJobSaved(job.id)
+                
+                // Debug log khi state thay đổi
+                LaunchedEffect(isJobSaved) {
+                    Log.d("HomeScreen", "Job ${job.title} saved state changed to: $isJobSaved")
+                }
+                
+                IconButton(
+                    onClick = {
+                        Log.d("HomeScreen", "Save/Unsave clicked for job: ${job.title}")
+                        if (isJobSaved) {
+                            viewModel.removeSavedJob(job.id)
+                        } else {
+                            viewModel.saveJob(job)
+                        }
+                    },
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        if (isJobSaved) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
+                        contentDescription = if (isJobSaved) "Bỏ lưu" else "Lưu việc làm",
+                        tint = if (isJobSaved) Color(0xFF2196F3) else Color.Gray,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+            
+            Spacer(Modifier.width(4.dp))
+            
             Button(
-                onClick = { /* Xử lý đăng ký việc */ },
+                onClick = { 
+                    // Ngăn việc click lan ra JobCard khi click button
+                    // Xử lý đăng ký việc ở đây
+                },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
                 modifier = Modifier.height(36.dp)
