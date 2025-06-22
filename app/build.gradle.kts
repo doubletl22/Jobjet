@@ -66,11 +66,16 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation(platform(libs.firebase.bom))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore-ktx") // Thư viện Firestore
+    implementation("com.google.firebase:firebase-storage-ktx")
     
     // Date/Time picker cho ứng tuyển
     implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
     // Icons extended
-    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
     
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     testImplementation(libs.junit)

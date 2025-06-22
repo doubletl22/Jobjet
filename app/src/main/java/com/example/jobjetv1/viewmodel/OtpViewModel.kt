@@ -13,8 +13,10 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.*
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
+import com.example.jobjetv1.repository.UserRepository
 
 class OtpViewModel : ViewModel() {
+    private val userRepository = UserRepository()
     var uiState by mutableStateOf(AuthUiState())
         private set
 
@@ -78,7 +80,16 @@ class OtpViewModel : ViewModel() {
             .addOnCompleteListener { task ->
                 uiState = uiState.copy(isLoading = false)
                 if (task.isSuccessful) {
-                    onSuccess()
+                    // GỌI TẠO PROFILE FIRESTORE Ở ĐÂY
+                    userRepository.createProfileIfNotExists { created ->
+                        if (created) {
+                            onSuccess()
+                        } else {
+                            val msg = "Đăng nhập thành công, nhưng không tạo được hồ sơ người dùng!"
+                            uiState = uiState.copy(errorMessage = msg)
+                            onError?.invoke(msg)
+                        }
+                    }
                 } else {
                     val msg = task.exception?.localizedMessage ?: "Mã OTP không đúng hoặc đã hết hạn."
                     uiState = uiState.copy(errorMessage = msg)
@@ -86,6 +97,7 @@ class OtpViewModel : ViewModel() {
                 }
             }
     }
+
 
     // Đếm ngược gửi lại OTP
     var resendSeconds by mutableStateOf(59)

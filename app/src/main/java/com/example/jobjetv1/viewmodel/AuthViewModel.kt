@@ -8,13 +8,11 @@ import com.example.jobjetv1.data.prefs.UserPrefs
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.*
 import java.util.concurrent.TimeUnit
-
-
-
-
+import com.example.jobjetv1.repository.UserRepository
 
 
 class AuthViewModel : ViewModel() {
+    private val userRepository = UserRepository()
     private var verificationId: String? = null
     var uiState by mutableStateOf(AuthUiState())
         private set
