@@ -1,4 +1,4 @@
-package com.example.jobjetv1.ui.view
+package com.example.jobjetv1.ui.view.mainscreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,16 +19,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jobjetv1.viewmodel.SearchViewModel
 import com.example.jobjetv1.data.model.JobCategory
 import com.google.accompanist.flowlayout.FlowRow
 import com.example.jobjetv1.R
+import com.example.jobjetv1.ui.view.BottomNavBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    viewModel: SearchViewModel = viewModel(),
     selectedTab: Int = 1,
     onTabSelected: (Int) -> Unit = {}
 ) {

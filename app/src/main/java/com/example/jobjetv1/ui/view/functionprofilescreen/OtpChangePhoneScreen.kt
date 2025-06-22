@@ -1,4 +1,4 @@
-package com.example.jobjetv1.ui.view
+package com.example.jobjetv1.ui.view.functionprofilescreen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions

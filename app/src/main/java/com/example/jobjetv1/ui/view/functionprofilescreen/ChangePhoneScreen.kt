@@ -1,4 +1,4 @@
-package com.example.jobjetv1.ui.view
+package com.example.jobjetv1.ui.view.functionprofilescreen
 
 import android.app.Activity
 import androidx.compose.foundation.layout.*

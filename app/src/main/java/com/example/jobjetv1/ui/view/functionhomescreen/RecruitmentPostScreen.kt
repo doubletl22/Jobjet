@@ -1,5 +1,6 @@
-package com.example.jobjetv1.ui.view
+package com.example.jobjetv1.ui.view.functionhomescreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jobjetv1.R
 import com.example.jobjetv1.data.model.JobPostUiState
 import com.example.jobjetv1.data.model.WorkType
@@ -25,7 +27,7 @@ import com.example.jobjetv1.viewmodel.RecruitmentViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecruitmentPostScreen(
-    viewModel: RecruitmentViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    viewModel: RecruitmentViewModel = viewModel(),
     onBack: () -> Unit = {},
     onSubmit: (JobPostUiState) -> Unit = {}
 ) {
@@ -219,15 +221,15 @@ fun RecruitmentPostScreen(
             // Nút đăng tuyển
             Button(
                 onClick = { 
-                    android.util.Log.d("RecruitmentPostScreen", "Submit button clicked")
+                    Log.d("RecruitmentPostScreen", "Submit button clicked")
                     errorMessage = null // Clear previous error
                     viewModel.validateAndSubmit(
                         onSuccess = { jobPost ->
-                            android.util.Log.d("RecruitmentPostScreen", "Job submitted successfully: ${jobPost.jobTitle}")
+                            Log.d("RecruitmentPostScreen", "Job submitted successfully: ${jobPost.jobTitle}")
                             onSubmit(jobPost)
                         },
                         onError = { error ->
-                            android.util.Log.d("RecruitmentPostScreen", "Job submission failed: $error")
+                            Log.d("RecruitmentPostScreen", "Job submission failed: $error")
                             errorMessage = error
                         }
                     )

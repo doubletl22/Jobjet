@@ -1,25 +1,30 @@
 package com.example.jobjetv1.navigation
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.jobjetv1.data.prefs.UserPrefs
 import com.example.jobjetv1.ui.view.loginscreen.*
-import com.example.jobjetv1.ui.view.*
+import com.example.jobjetv1.ui.view.functionhomescreen.ApplicationScreen
+import com.example.jobjetv1.ui.view.functionhomescreen.ApplicationSuccessScreen
+import com.example.jobjetv1.ui.view.functionhomescreen.JobDetailScreen
+import com.example.jobjetv1.ui.view.functionhomescreen.RecruitmentPostScreen
+import com.example.jobjetv1.ui.view.functionprofilescreen.ChangePhoneScreen
+import com.example.jobjetv1.ui.view.functionprofilescreen.EditAvatarScreen
+import com.example.jobjetv1.ui.view.functionprofilescreen.EditProfileScreen
+import com.example.jobjetv1.ui.view.functionprofilescreen.OtpChangePhoneScreen
+import com.example.jobjetv1.ui.view.functionprofilescreen.SavedJobsScreen
 import com.example.jobjetv1.viewmodel.*
-import com.example.jobjetv1.data.model.ProfileUiState
-import com.example.jobjetv1.data.model.JobPostUiState
+import com.example.jobjetv1.ui.view.mainscreen.HomeScreen
+import com.example.jobjetv1.ui.view.mainscreen.NotificationScreen
+import com.example.jobjetv1.ui.view.mainscreen.ProfileScreen
+import com.example.jobjetv1.ui.view.mainscreen.SearchScreen
 
 @Composable
 fun AppNavHost() {
@@ -68,7 +73,7 @@ fun AppNavHost() {
                     savedJobsViewModel = savedJobsViewModel, // Truyền SavedJobsViewModel
                     selectedTab = 0,
                     onTabSelected = {
-                        when(it) {
+                        when (it) {
                             0 -> {} // Đã ở Home
                             1 -> navController.navigate("search") { launchSingleTop = true }
                             2 -> navController.navigate("profile") { launchSingleTop = true }
@@ -83,7 +88,7 @@ fun AppNavHost() {
             composable("job_detail/{jobId}") { backStackEntry ->
                 val jobId = backStackEntry.arguments?.getString("jobId")
                 val job = homeViewModel.getJobById(jobId ?: "")
-                
+
                 JobDetailScreen(
                     job = job,
                     savedJobsViewModel = savedJobsViewModel,
@@ -97,7 +102,7 @@ fun AppNavHost() {
             composable("application/{jobId}") { backStackEntry ->
                 val jobId = backStackEntry.arguments?.getString("jobId")
                 val job = homeViewModel.getJobById(jobId ?: "")
-                
+
                 ApplicationScreen(
                     job = job,
                     onBack = { navController.popBackStack() },
@@ -111,7 +116,7 @@ fun AppNavHost() {
             }
             composable("application_success/{jobTitle}") { backStackEntry ->
                 val jobTitle = backStackEntry.arguments?.getString("jobTitle") ?: "Công việc"
-                
+
                 ApplicationSuccessScreen(
                     jobTitle = jobTitle,
                     onBackToHome = {
@@ -128,7 +133,7 @@ fun AppNavHost() {
             composable("search") {
                 SearchScreen(
                     onTabSelected = {
-                        when(it) {
+                        when (it) {
                             0 -> navController.navigate("home") { launchSingleTop = true }
                             2 -> navController.navigate("profile") { launchSingleTop = true }
                             3 -> navController.navigate("notifications") { launchSingleTop = true }
@@ -139,10 +144,11 @@ fun AppNavHost() {
             composable("profile") {
                 ProfileScreen(
                     savedJobsViewModel = savedJobsViewModel,
+                    onEditProfile = { navController.navigate("edit_profile") },
                     onRecruitClick = { navController.navigate("recruitment_post") },
                     onSavedJobsClick = { navController.navigate("saved_jobs") },
                     onTabSelected = {
-                        when(it) {
+                        when (it) {
                             0 -> navController.navigate("home") { launchSingleTop = true }
                             1 -> navController.navigate("search") { launchSingleTop = true }
                             3 -> navController.navigate("notifications") { launchSingleTop = true }
@@ -150,6 +156,47 @@ fun AppNavHost() {
                     }
                 )
             }
+            composable("edit_profile") {
+                EditProfileScreen(
+                    onChangeAvatar = { navController.navigate("edit_avatar") },
+                    onChangeNumberPhone = { navController.navigate("change_phone") },
+                    onBack = { navController.popBackStack() },
+                    onDone = { navController.navigate("profile") },
+                    onDelete = { /* xử lý xoá hồ sơ */ },
+                    onFieldClick = { field ->
+                    }
+                )
+            }
+            composable("edit_avatar") {
+                EditAvatarScreen(
+                    onBack = { navController.popBackStack() },
+                    onTakePhoto = { /* mở camera */ },
+                    onPickGallery = { /* mở thư viện */ },
+                    onDeletePhoto = { /* xóa avatar */ }
+                )
+            }
+            composable("change_phone") {
+                val otpViewModel: OtpViewModel = viewModel()
+                ChangePhoneScreen(
+                    viewModel = otpViewModel,
+                    currentPhone = "0912 345 678",
+                    onBack = { navController.popBackStack() },
+                    onOtpSent = { navController.navigate("otp/change_phone") }
+                )
+            }
+
+            composable("otp/change_phone") {
+                val otpViewModel: OtpViewModel = viewModel()
+                OtpChangePhoneScreen(
+                    viewModel = otpViewModel,
+                    phone = otpViewModel.uiState.phone,
+                    onBack = { navController.popBackStack() },
+                    onOtpSuccess = {
+                        navController.popBackStack("edit_profile", inclusive = false)
+                    }
+                )
+            }
+
             composable("saved_jobs") {
                 SavedJobsScreen(
                     viewModel = savedJobsViewModel,
@@ -162,7 +209,7 @@ fun AppNavHost() {
             composable("notifications") {
                 NotificationScreen(
                     onTabNavSelected = {
-                        when(it) {
+                        when (it) {
                             0 -> navController.navigate("home") { launchSingleTop = true }
                             1 -> navController.navigate("search") { launchSingleTop = true }
                             2 -> navController.navigate("profile") { launchSingleTop = true }

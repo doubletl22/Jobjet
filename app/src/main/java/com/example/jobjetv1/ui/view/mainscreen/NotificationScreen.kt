@@ -1,4 +1,4 @@
-package com.example.jobjetv1.ui.view
+package com.example.jobjetv1.ui.view.mainscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,16 +12,19 @@ import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jobjetv1.data.model.NotificationItem
 import com.example.jobjetv1.data.model.NotificationType
 import com.example.jobjetv1.viewmodel.NotificationViewModel
 import com.example.jobjetv1.R
+import com.example.jobjetv1.ui.view.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(
-    viewModel: NotificationViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    viewModel: NotificationViewModel = viewModel(),
     onTabSelected: (Int) -> Unit = {},
     onMenuClick: (NotificationItem) -> Unit = {},
     selectedTab: Int = 3,
@@ -143,7 +146,7 @@ fun NotificationCard(
                     }
                     Text(item.title, fontWeight = if (!item.isRead) FontWeight.Bold else FontWeight.Normal, fontSize = 15.sp)
                 }
-                Text(item.message, fontSize = 14.sp, color = Color.Gray, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                Text(item.message, fontSize = 14.sp, color = Color.Gray, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(item.time, fontSize = 13.sp, color = Color(0xFFB0B0B0), modifier = Modifier.padding(top = 1.dp))
             }
             IconButton(onClick = { onMenuClick(item) }) {

@@ -1,4 +1,4 @@
-package com.example.jobjetv1.ui.view
+package com.example.jobjetv1.ui.view.mainscreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,6 +30,7 @@ import com.example.jobjetv1.data.model.ProfileUiState
 import com.example.jobjetv1.data.model.SavedJob
 import com.example.jobjetv1.viewmodel.SavedJobsViewModel
 import com.example.jobjetv1.R
+import com.example.jobjetv1.ui.view.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,13 +43,12 @@ fun ProfileScreen(
     onAddBank: () -> Unit = {},
     onCheckIn: () -> Unit = {},
     onCheckOut: () -> Unit = {},
-    onSavedJobClick: (SavedJob) -> Unit = {},
     onSeeAllSavedJobs: () -> Unit = {},
     onSeeHistory: () -> Unit = {},
     onChangeMainBank: () -> Unit = {},
     selectedTab: Int = 2,
     onTabSelected: (Int) -> Unit = {},
-    // Thêm tham số cho saved jobs mới
+
     onSavedJobsClick: () -> Unit = {}
 ) {
     Scaffold(
@@ -108,26 +107,21 @@ fun ProfileScreen(
                 // Progress
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    CircularProgressIndicator(
-                        progress = profile.progress / 100f,
-                        color = Color(0xFF2196F3),
-                        trackColor = Color(0xFFE3E3E3),
-                        modifier = Modifier.size(46.dp),
-                        strokeWidth = 5.dp
-                    )
                     Spacer(Modifier.width(15.dp))
-                    Column {
-                        Text("Hoàn thiện hồ sơ của bạn", fontWeight = FontWeight.Medium, fontSize = 15.sp)
-                        Button(
-                            onClick = onUpdateProfile,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 3.dp),
-                            modifier = Modifier.height(30.dp)
-                        ) {
-                            Text("Cập nhật", fontSize = 13.sp, color = Color.White, fontWeight = FontWeight.Bold)
-                        }
+                    Text("Hoàn thiện hồ sơ của bạn", fontWeight = FontWeight.Medium, fontSize = 15.sp)
+
+                    Button(
+                        onClick = onUpdateProfile,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 3.dp),
+                        modifier = Modifier
+                            .height(30.dp)
+                            .weight(1f, fill = false)
+                    ) {
+                        Text("Cập nhật", fontSize = 13.sp, color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
                 Spacer(Modifier.height(15.dp))
@@ -173,7 +167,7 @@ fun ProfileScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Default.Bookmark,
+                            painter = painterResource(id = R.drawable.baseline_bookmark_24),
                             contentDescription = null,
                             tint = Color(0xFF2196F3),
                             modifier = Modifier.size(24.dp)
