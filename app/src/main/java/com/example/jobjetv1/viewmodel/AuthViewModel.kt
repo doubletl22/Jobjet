@@ -29,16 +29,19 @@ class AuthViewModel : ViewModel() {
         onCodeSent: (verificationId: String) -> Unit,
         onFailed: (String) -> Unit
     ) {
-        if (uiState.phone.length != 10) {
-            setError("Số điện thoại phải có đúng 10 chữ số")
+        val phone = uiState.phone
+        if (!(phone.length == 10 && phone.all { it.isDigit() })) {
+            setError("Số điện thoại phải có đúng 10 số.")
             onFailed("Số điện thoại không hợp lệ")
             return
         }
         setLoading(true)
         setError(null)
         val auth = FirebaseAuth.getInstance()
+        // Chuyển 0xxxxxxx thành +84xxxxxxxxx khi gửi lên Firebase
+        val firebasePhone = "+84" + phone.substring(1)
         val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(uiState.phone)
+            .setPhoneNumber(firebasePhone)
             .setTimeout(60L, TimeUnit.SECONDS)
             .setActivity(activity)
             .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {

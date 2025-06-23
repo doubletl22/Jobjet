@@ -73,7 +73,7 @@ fun LoginScreen(
                     onCodeSent = { verificationId ->
                         onLoginSuccess(state.phone, verificationId)
                     },
-                    onFailed = { /* ... */ }
+                    onFailed = { /* Handle failure if needed */ }
                 )
             },
             enabled = state.phone.length == 10 && !state.isLoading, // Note: This might be a bug if you also want to enable for "+84" numbers
@@ -91,9 +91,11 @@ fun LoginScreen(
         } // <-- The incorrect comma that was here is now REMOVED.
 
         // Now this 'if' statement is a direct child of the Column, which is correct.
-        if (state.phone.isNotEmpty() && state.phone.length != 10) {
+        if (state.phone.isNotEmpty() &&
+            !(state.phone.length == 10 && state.phone.all { it.isDigit() }) &&
+            !(state.phone.startsWith("+") && state.phone.length == 13 && state.phone.drop(1).all { it.isDigit() })) {
             Text(
-                "Số điện thoại phải có đúng 10 số.",
+                "Số điện thoại phải có 10 số hoặc đầy đủ mã quốc gia (+84...)",
                 color = Color.Red,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 4.dp)
