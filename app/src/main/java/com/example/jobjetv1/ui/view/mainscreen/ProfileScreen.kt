@@ -36,7 +36,8 @@ fun ProfileScreen(
     onRecruitClick: () -> Unit = {},
     onSavedJobsClick: () -> Unit = {},
     selectedTab: Int = 2,
-    onTabSelected: (Int) -> Unit = {}
+    onTabSelected: (Int) -> Unit = {},
+    onLogout: () -> Unit
 ) {
     val uiState = viewModel.uiState
 
@@ -166,6 +167,18 @@ fun ProfileScreen(
                                 },
                                 modifier = Modifier.clickable { onSavedJobsClick() }
                             )
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Button(
+                            onClick = { viewModel.logout(onLogout) }, // ACTION
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) { // CONTENT starts here
+                            Text("Đăng xuất", color = MaterialTheme.colorScheme.onError)
                         }
                     }
                 }

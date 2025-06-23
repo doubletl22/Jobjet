@@ -52,7 +52,7 @@ import java.util.*
 fun ProfileInfoScreen(
     viewModel: ProfileInfoViewModel,
     onProfileComplete: () -> Unit,
-    onLogout: () -> Unit
+
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -217,17 +217,6 @@ fun ProfileInfoScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Logout Button (Corrected)
-            Button(
-                onClick = { viewModel.logout(onLogout) }, // ACTION
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-            ) { // CONTENT starts here
-                Text("Đăng xuất", color = MaterialTheme.colorScheme.onError)
-            }
 
             // Error message
             viewModel.uiState.errorMessage?.let { error ->

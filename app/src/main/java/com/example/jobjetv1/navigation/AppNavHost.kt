@@ -87,11 +87,6 @@ fun AppNavHost() {
                         navController.navigate("home") { 
                             popUpTo(0)
                         }
-                    },
-                    onLogout = {
-                        navController.navigate("login") {
-                            popUpTo(0)
-                        }
                     }
                 )
             }
@@ -177,6 +172,11 @@ fun AppNavHost() {
                     onEditProfile = { navController.navigate("edit_profile") },
                     onRecruitClick = { navController.navigate("recruitment_post") },
                     onSavedJobsClick = { navController.navigate("saved_jobs") },
+                    onLogout = {
+                        navController.navigate("login") {
+                            popUpTo(0)
+                        }
+                    },
                     onTabSelected = {
                         when (it) {
                             0 -> navController.navigate("home") { launchSingleTop = true }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import com.example.jobjetv1.repository.UserProfile
 import com.example.jobjetv1.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
 
 data class ProfileUiState(
     val isLoading: Boolean = false,
@@ -31,6 +32,11 @@ class ProfileViewModel : ViewModel() {
 
     private fun setUserProfile(profile: UserProfile) {
         uiState = uiState.copy(userProfile = profile)
+    }
+
+    fun logout(onLogoutSuccess: () -> Unit) {
+        FirebaseAuth.getInstance().signOut()
+        onLogoutSuccess()
     }
 
     fun loadUserProfile() {
