@@ -29,6 +29,11 @@ class AuthViewModel : ViewModel() {
         onCodeSent: (verificationId: String) -> Unit,
         onFailed: (String) -> Unit
     ) {
+        if (uiState.phone.length != 10) {
+            setError("Số điện thoại phải có đúng 10 chữ số")
+            onFailed("Số điện thoại không hợp lệ")
+            return
+        }
         setLoading(true)
         setError(null)
         val auth = FirebaseAuth.getInstance()

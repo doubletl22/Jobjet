@@ -43,10 +43,15 @@ fun LoginScreen(
         Spacer(Modifier.height(30.dp))
         OutlinedTextField(
             value = state.phone,
-            onValueChange = { viewModel.onPhoneChanged(it) },
-            label = { Text("Nhập số điện thoại của bạn") },
+            onValueChange = { 
+                if (it.length <= 10 && it.all { c -> c.isDigit() }) {
+                    viewModel.onPhoneChanged(it)
+                }
+            },
+            label = { Text("Nhập số điện thoại của bạn (10 chữ số)") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             colors = OutlinedTextFieldDefaults.colors( // Hoặc TextFieldDefaults nếu bạn đang dùng Material2
                 focusedBorderColor = Blue,
                 unfocusedBorderColor = Color.Gray,
@@ -65,15 +70,23 @@ fun LoginScreen(
                     onFailed = { }
                 )
             },
-            enabled = state.phone.length >= 10 && !state.isLoading,
+            enabled = state.phone.length == 10 && !state.isLoading,
             modifier = Modifier.fillMaxWidth().height(48.dp),
                 colors = ButtonDefaults.buttonColors(
             containerColor = Blue, // Màu nền của nút khi kích hoạt
             contentColor = Color.White, // Màu văn bản/biểu tượng trên nút khi kích hoạt
             disabledContainerColor = BlueLight, // Màu nền của nút khi bị vô hiệu hóa
-            disabledContentColor = Color.Gray )// Màu văn bản/biểu tượng trên nút khi bị vô hiệu hóa
+            disabledContentColor = Color.Gray // Màu văn bản/biểu tượng trên nút khi bị vô hiệu hóa
         ) {
             Text("TIẾP TỤC", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+        }
+        if (state.phone.isNotEmpty() && state.phone.length != 10) {
+            Text(
+                "Số điện thoại phải có đúng 10 chữ số",
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
         if (state.isLoading) CircularProgressIndicator(Modifier.padding(top = 16.dp))
         state.errorMessage?.let { Text(it, color = Color.Red, modifier = Modifier.padding(top = 12.dp)) }
