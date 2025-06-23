@@ -44,11 +44,12 @@ fun LoginScreen(
         OutlinedTextField(
             value = state.phone,
             onValueChange = { 
-                if (it.length <= 10 && it.all { c -> c.isDigit() }) {
+                if ((it.startsWith("+") && it.length <= 13 && it.drop(1).all { c -> c.isDigit() }) ||
+                    (it.length <= 10 && it.all { c -> c.isDigit() })) {
                     viewModel.onPhoneChanged(it)
                 }
             },
-            label = { Text("Nhập số điện thoại của bạn (10 chữ số)") },
+            label = { Text("Nhập số điện thoại (10 số hoặc +84...)") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -80,9 +81,11 @@ fun LoginScreen(
         ) {
             Text("TIẾP TỤC", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
         }
-        if (state.phone.isNotEmpty() && state.phone.length != 10) {
+        if (state.phone.isNotEmpty() && 
+            !(state.phone.length == 10 && state.phone.all { it.isDigit() }) &&
+            !(state.phone.startsWith("+") && state.phone.length == 13 && state.phone.drop(1).all { it.isDigit() })) {
             Text(
-                "Số điện thoại phải có đúng 10 chữ số",
+                "Số điện thoại phải có 10 số hoặc đầy đủ mã quốc gia (+84...)",
                 color = Color.Red,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 4.dp)

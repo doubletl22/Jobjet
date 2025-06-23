@@ -29,8 +29,10 @@ class AuthViewModel : ViewModel() {
         onCodeSent: (verificationId: String) -> Unit,
         onFailed: (String) -> Unit
     ) {
-        if (uiState.phone.length != 10) {
-            setError("Số điện thoại phải có đúng 10 chữ số")
+        val phone = uiState.phone
+        if (!(phone.length == 10 && phone.all { it.isDigit() }) &&
+            !(phone.startsWith("+84") && phone.length == 13 && phone.drop(3).all { it.isDigit() })) {
+            setError("Số điện thoại phải có 10 số hoặc đầy đủ mã quốc gia (+84...)")
             onFailed("Số điện thoại không hợp lệ")
             return
         }
