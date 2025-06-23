@@ -23,9 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.jobjetv1.R
+import com.example.jobjetv1.data.model.BankInfo
 import com.example.jobjetv1.ui.view.BottomNavBar
+import com.example.jobjetv1.viewmodel.ProfileUiState
 import com.example.jobjetv1.viewmodel.ProfileViewModel
 import com.example.jobjetv1.viewmodel.SavedJobsViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +40,9 @@ fun ProfileScreen(
     onSavedJobsClick: () -> Unit = {},
     selectedTab: Int = 2,
     onTabSelected: (Int) -> Unit = {},
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onAddBank: () -> Unit = {},
+    onChangeMainBank: () -> Unit = {}
 ) {
     val uiState = viewModel.uiState
 
@@ -152,9 +157,6 @@ fun ProfileScreen(
                                 },
                                 modifier = Modifier.clickable { onRecruitClick() }
                             )
-                            
-                            Divider()
-                            
                             // Saved Jobs Button
                             ListItem(
                                 headlineContent = { Text("Việc làm đã lưu") },
@@ -168,18 +170,58 @@ fun ProfileScreen(
                                 modifier = Modifier.clickable { onSavedJobsClick() }
                             )
                         }
-
-                        Spacer(Modifier.height(16.dp))
-
-                        Button(
-                            onClick = { viewModel.logout(onLogout) }, // ACTION
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                        ) { // CONTENT starts here
-                            Text("Đăng xuất", color = MaterialTheme.colorScheme.onError)
+                    }
+                    Card(
+                        shape = RoundedCornerShape(13.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(Modifier.padding(14.dp)) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Ngân hàng liên kết", fontWeight = FontWeight.Medium)
+                                TextButton(onClick = onAddBank, contentPadding = PaddingValues(0.dp)) {
+                                    Text("Thêm mới", fontSize = 14.sp, color = Color(0xFF2196F3))
+                                }
+                            }
+                            Card(
+                                shape = RoundedCornerShape(11.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 6.dp)
+                            ) {
+                                Row(
+                                    Modifier.padding(11.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(painterResource(R.drawable.outline_person_24), contentDescription = null, tint = Color(0xFF2196F3), modifier = Modifier.size(26.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Column(Modifier.weight(1f)) {
+                                        Text("Vietcombank", fontWeight = FontWeight.Bold)
+                                        Text("**** 5678", color = Color.Gray, fontSize = 14.sp)
+                                    }
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Text("Mặc định", color = Color(0xFF2196F3), fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                                        Text("2,500,000 VND", fontWeight = FontWeight.Bold, color = Color.Black)
+                                    }
+                                }
+                            }
                         }
+                    }
+                }
+                item{
+                    Button(
+                        onClick = { viewModel.logout(onLogout) }, // ACTION
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) { // CONTENT starts here
+                        Text("Đăng xuất", color = MaterialTheme.colorScheme.onError)
                     }
                 }
             }

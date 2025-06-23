@@ -1,6 +1,6 @@
 package com.example.jobjetv1.data.model
 
-data class ProfileUiState(
+data class ProfileUiStat(
     val name: String = "Nguyễn Văn A",
     val avatarUrl: String? = null,
     val rating: Float = 4.8f,
@@ -15,3 +15,4 @@ data class ProfileUiState(
 )
 data class BankInfo(val bankName: String, val accNo: String, val balance: Int, val isDefault: Boolean)
 data class SavedJob(val title: String, val company: String, val address: String, val wage: String)
+data class ProfileUiState(val mainBank: BankInfo = BankInfo("Vietcombank", "**** 5678", 2_500_000, isDefault = true ))

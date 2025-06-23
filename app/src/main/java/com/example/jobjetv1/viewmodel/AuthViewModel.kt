@@ -38,7 +38,6 @@ class AuthViewModel : ViewModel() {
         setLoading(true)
         setError(null)
         val auth = FirebaseAuth.getInstance()
-        // Chuyển 0xxxxxxx thành +84xxxxxxxxx khi gửi lên Firebase
         val firebasePhone = "+84" + phone.substring(1)
         val options = PhoneAuthOptions.newBuilder(auth)
             .setPhoneNumber(firebasePhone)
