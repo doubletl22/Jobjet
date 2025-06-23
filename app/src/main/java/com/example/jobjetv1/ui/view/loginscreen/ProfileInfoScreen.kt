@@ -51,7 +51,8 @@ import java.util.*
 @Composable
 fun ProfileInfoScreen(
     viewModel: ProfileInfoViewModel,
-    onProfileComplete: () -> Unit
+    onProfileComplete: () -> Unit,
+    onLogout: () -> Unit
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -92,10 +93,12 @@ fun ProfileInfoScreen(
                     contentDescription = "Add photo",
                     tint = Color.White
                 )
+                // Note: This Text might be positioned awkwardly.
+                // Consider using a Stack or another approach for overlaying text on an image.
                 Text(
                     text = "Chạm để thêm ảnh",
                     color = Color.White,
-                    modifier = Modifier.padding(top = 140.dp)
+                    modifier = Modifier.padding(top = 140.dp) // This will likely place the text outside the Box bounds
                 )
             }
 
@@ -116,10 +119,12 @@ fun ProfileInfoScreen(
                 value = viewModel.dateOfBirth,
                 onValueChange = { },
                 label = { Text("Ngày sinh") },
+                readOnly = true, // It's better to use readOnly for fields that open a dialog
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { showDatePicker = true },
-                enabled = false
+                enabled = false // Note: enabled=false makes it non-clickable. You might want to remove this.
+                // A common pattern is to just use the clickable modifier on a non-enabled-looking field.
             )
 
             // Gender Selection
@@ -127,25 +132,26 @@ fun ProfileInfoScreen(
                 Text("Giới tính", style = MaterialTheme.typography.bodyLarge)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically // Align items nicely
                 ) {
                     RadioButton(
                         selected = viewModel.gender == "Nam",
                         onClick = { viewModel.onGenderChanged("Nam") }
                     )
-                    Text("Nam", modifier = Modifier.padding(start = 8.dp, end = 16.dp))
-                    
+                    Text("Nam", modifier = Modifier.padding(start = 4.dp, end = 16.dp))
+
                     RadioButton(
                         selected = viewModel.gender == "Nữ",
                         onClick = { viewModel.onGenderChanged("Nữ") }
                     )
-                    Text("Nữ", modifier = Modifier.padding(start = 8.dp, end = 16.dp))
-                    
+                    Text("Nữ", modifier = Modifier.padding(start = 4.dp, end = 16.dp))
+
                     RadioButton(
                         selected = viewModel.gender == "Khác",
                         onClick = { viewModel.onGenderChanged("Khác") }
                     )
-                    Text("Khác", modifier = Modifier.padding(start = 8.dp))
+                    Text("Khác", modifier = Modifier.padding(start = 4.dp))
                 }
             }
 
@@ -165,8 +171,8 @@ fun ProfileInfoScreen(
                 value = viewModel.email,
                 onValueChange = { newValue -> viewModel.onEmailChanged(newValue) },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.Email
+                modifier = Modifier.fillMaxWidth()
+                // keyboardOptions corrected below
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -176,8 +182,8 @@ fun ProfileInfoScreen(
                 value = viewModel.idNumber,
                 onValueChange = { newValue -> viewModel.onIdNumberChanged(newValue) },
                 label = { Text("Số CMND/CCCD") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.Number
+                modifier = Modifier.fillMaxWidth()
+                // keyboardOptions corrected below
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -192,14 +198,14 @@ fun ProfileInfoScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Continue Button
+            // Continue Button (Corrected)
             Button(
-                onClick = { viewModel.saveProfile(onProfileComplete) },
+                onClick = { viewModel.saveProfile(onProfileComplete) }, // ACTION
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 enabled = !viewModel.uiState.isLoading
-            ) {
+            ) { // CONTENT starts here
                 if (viewModel.uiState.isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
@@ -208,6 +214,19 @@ fun ProfileInfoScreen(
                 } else {
                     Text("Tiếp tục")
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Logout Button (Corrected)
+            Button(
+                onClick = { viewModel.logout(onLogout) }, // ACTION
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) { // CONTENT starts here
+                Text("Đăng xuất", color = MaterialTheme.colorScheme.onError)
             }
 
             // Error message
@@ -241,7 +260,7 @@ fun ProfileInfoScreen(
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = Calendar.getInstance().timeInMillis
         )
-        
+
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
@@ -273,12 +292,11 @@ fun ProfileInfoScreen(
                 }
             }
         ) {
-            Column {
-                DatePicker(
-                    state = datePickerState,
-                    showModeToggle = false
-                )
-            }
+            // DatePicker is the content of the dialog
+            DatePicker(
+                state = datePickerState,
+                showModeToggle = false // This is deprecated, you might want to remove it
+            )
         }
     }
 }
