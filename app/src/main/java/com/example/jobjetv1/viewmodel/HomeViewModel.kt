@@ -3,33 +3,37 @@ package com.example.jobjetv1.viewmodel
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import com.example.jobjetv1.data.model.Job
-import com.example.jobjetv1.repository.JobsRepository
+import com.example.jobjetv1.repository.JobsRepositoryFirestore
 
 class HomeViewModel : ViewModel() {
     
     // Jobs từ repository - sử dụng derivedStateOf để Compose track thay đổi
-    val jobs: List<Job> by derivedStateOf { JobsRepository.allJobs }
+    val jobs: List<Job> by derivedStateOf { JobsRepositoryFirestore.allJobs }
     
     /**
      * Tìm kiếm jobs
      */
     fun searchJobs(query: String): List<Job> {
-        return JobsRepository.searchJobs(query)
+        // Implement search if needed, currently not implemented in Firestore repo
+        return jobs.filter { job ->
+            job.title.contains(query, ignoreCase = true) ||
+            job.address.contains(query, ignoreCase = true) ||
+            job.description.contains(query, ignoreCase = true)
+        }
     }
     
     /**
      * Lấy job theo ID
      */
     fun getJobById(id: String): Job? {
-        return JobsRepository.getJobById(id)
+        return JobsRepositoryFirestore.getJobById(id)
     }
     
     /**
      * Refresh jobs (có thể dùng cho pull-to-refresh)
      */
     fun refreshJobs() {
-        // In real app, this would call API to refresh data
-        // For now, jobs are automatically updated via JobsRepository
+        // Firestore updates automatically handled by listener
     }
     
     /**
@@ -56,6 +60,7 @@ class HomeViewModel : ViewModel() {
      * Test function để thêm job để test
      */
     fun addTestJob(): Job {
-        return JobsRepository.addTestJob()
+        // Not implemented in Firestore repo
+        throw UnsupportedOperationException("addTestJob not supported in Firestore repository")
     }
 }

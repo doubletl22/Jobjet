@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
 import android.util.Log
 import com.example.jobjetv1.data.model.JobPostUiState
 import com.example.jobjetv1.data.model.WorkType
-import com.example.jobjetv1.repository.JobsRepository
+import com.example.jobjetv1.repository.JobsRepositoryFirestore
 
 data class ValidationState(
     val companyNameError: String? = null,
@@ -118,12 +118,18 @@ class RecruitmentViewModel : ViewModel() {
                 delay(2000) // Simulate network delay
                 
                 Log.d("RecruitmentViewModel", "Adding job to repository...")                // Thêm job vào repository - QUAN TRỌNG: Đây là điểm kết nối
-                val newJob = JobsRepository.addJobFromPost(state)
+                val newJob = JobsRepositoryFirestore.addJobFromPost(state)
                 
-                Log.d("RecruitmentViewModel", "Job added successfully: ${newJob.title}")
-                isSubmitting = false
-                submitSuccess = true
-                onSuccess(state)
+                if (newJob != null) {
+                    Log.d("RecruitmentViewModel", "Job added successfully: ${newJob.title}")
+                    isSubmitting = false
+                    submitSuccess = true
+                    onSuccess(state)
+                } else {
+                    Log.d("RecruitmentViewModel", "Failed to add job")
+                    isSubmitting = false
+                    onError("Đăng bài thất bại: Không thể thêm công việc")
+                }
                 
             } catch (e: Exception) {
                 Log.e("RecruitmentViewModel", "Error submitting job", e)
