@@ -45,13 +45,15 @@ fun HomeScreen(
     
     // Reactive jobs list - sẽ tự động recompose khi jobs thay đổi
     val allJobs by remember { derivedStateOf { viewModel.jobs } }
-    
+
     val jobs = remember(allJobs, searchText) {
-        allJobs.filter {
-            it.title.contains(searchText, true) ||
-                    it.address.contains(searchText, true) ||
-                    it.description.contains(searchText, true)
-        }
+        allJobs
+            .distinctBy { it.id } // <-- THÊM DÒNG NÀY ĐỂ XÓA TRÙNG LẶP
+            .filter {
+                it.title.contains(searchText, true) ||
+                        it.address.contains(searchText, true) ||
+                        it.description.contains(searchText, true)
+            }
     }
 
     Scaffold(

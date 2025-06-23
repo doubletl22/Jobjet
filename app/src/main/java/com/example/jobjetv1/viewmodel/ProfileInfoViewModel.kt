@@ -57,11 +57,6 @@ class ProfileInfoViewModel : ViewModel() {
         uiState = uiState.copy(isSuccess = isSuccess)
     }
 
-    fun logout(onLogoutSuccess: () -> Unit) {
-        FirebaseAuth.getInstance().signOut()
-        onLogoutSuccess()
-    }
-
     fun onFullNameChanged(value: String) {
         fullName = value
     }

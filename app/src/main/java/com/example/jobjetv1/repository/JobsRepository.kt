@@ -2,9 +2,6 @@ package com.example.jobjetv1.repository
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import com.example.jobjetv1.data.model.Job
 import com.example.jobjetv1.data.model.JobPostUiState
 import com.example.jobjetv1.R
@@ -23,10 +20,6 @@ object JobsRepository {
         Job("3", "Kho Shoppe", "618/1B Âu cơ, P10, Tân Bình", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
         Job("4", "Nhà hàng", "202 Hoàng Văn Thụ, Phú Nhuận", "Phân loại bưu kiện, sắp xếp hàng hóa.", "25,000 VND/Giờ", Color(0xFF43A047), R.drawable.outline_restaurant_24),
         Job("5", "Kho Shoppe", "123 Nguyễn Hữu Tiến, Tân Phú", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
-        Job("6", "Kho Shoppe", "123 Nguyễn Hữu Tiến, Tân Phú", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
-        Job("7", "Kho Shoppe", "123 Nguyễn Hữu Tiến, Tân Phú", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
-        Job("8", "Kho Shoppe", "123 Nguyễn Hữu Tiến, Tân Phú", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
-        Job("9", "Kho Shoppe", "123 Nguyễn Hữu Tiến, Tân Phú", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
     )
     
     /**

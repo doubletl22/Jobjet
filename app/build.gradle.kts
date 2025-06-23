@@ -67,6 +67,8 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.4-beta")
+    implementation("com.google.accompanist:accompanist-permissions:0.31.4-beta")
+
 
     implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-auth")
