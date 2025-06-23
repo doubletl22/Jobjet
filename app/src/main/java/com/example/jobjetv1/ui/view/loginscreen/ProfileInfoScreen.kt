@@ -287,10 +287,12 @@ fun ProfileInfoScreen(
                 }
             }
         ) {
-            DatePicker(
-                state = datePickerState,
-                showModeToggle = false
-            )
+            Column {
+                DatePicker(
+                    state = datePickerState,
+                    showModeToggle = false
+                )
+            }
         }
     }
 }
