@@ -87,6 +87,11 @@ fun AppNavHost() {
                         navController.navigate("home") { 
                             popUpTo(0)
                         }
+                    },
+                    onLogout = {
+                        navController.navigate("login") {
+                            popUpTo(0)
+                        }
                     }
                 )
             }

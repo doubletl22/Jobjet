@@ -50,7 +50,8 @@ import java.util.*
 @Composable
 fun ProfileInfoScreen(
     viewModel: ProfileInfoViewModel,
-    onProfileComplete: () -> Unit
+    onProfileComplete: () -> Unit,
+    onLogout: () -> Unit
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -206,6 +207,19 @@ fun ProfileInfoScreen(
                 } else {
                     Text("Tiếp tục")
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Logout Button
+            Button(
+                onClick = { viewModel.logout(onLogout) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) {
+                Text("Đăng xuất", color = MaterialTheme.colorScheme.onError)
             }
 
             // Error message
