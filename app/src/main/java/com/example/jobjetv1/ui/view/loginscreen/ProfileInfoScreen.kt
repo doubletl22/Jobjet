@@ -46,8 +46,13 @@ import androidx.compose.ui.unit.dp
 import com.example.jobjetv1.R
 import com.example.jobjetv1.viewmodel.ProfileInfoViewModel
 import java.util.*
+import android.Manifest
+import android.os.Build
+import com.google.accompanist.permissions.ExperimentalPermissionsApi // <-- Thêm import này
+import com.google.accompanist.permissions.isGranted // <-- Thêm import này
+import com.google.accompanist.permissions.rememberPermissionState
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ProfileInfoScreen(
     viewModel: ProfileInfoViewModel,
@@ -58,6 +63,13 @@ fun ProfileInfoScreen(
     val scrollState = rememberScrollState()
     var showDatePicker by remember { mutableStateOf(false) }
 
+    val permissionState = rememberPermissionState(
+        permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+    )
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
@@ -84,7 +96,17 @@ fun ProfileInfoScreen(
                 modifier = Modifier
                     .size(120.dp)
                     .background(Color.LightGray, shape = CircleShape)
-                    .clickable { imagePicker.launch("image/*") }
+                    // 2. CẬP NHẬT HÀNH ĐỘNG CLICK
+                    .clickable {
+                        // Kiểm tra xem quyền đã được cấp chưa
+                        if (permissionState.status.isGranted) {
+                            // Nếu đã có quyền, mở ngay thư viện ảnh
+                            imagePicker.launch("image/*")
+                        } else {
+                            // Nếu chưa có quyền, hiển thị hộp thoại xin quyền
+                            permissionState.launchPermissionRequest()
+                        }
+                    }
                     .align(Alignment.CenterHorizontally),
                 contentAlignment = Alignment.Center
             ) {
