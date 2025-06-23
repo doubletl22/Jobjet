@@ -10,7 +10,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.jobjetv1.data.prefs.UserPrefs
-import com.example.jobjetv1.ui.view.loginscreen.*
+import com.example.jobjetv1.ui.view.loginscreen.LoginScreen
+import com.example.jobjetv1.ui.view.loginscreen.OtpScreen
+import com.example.jobjetv1.ui.view.loginscreen.SuccessScreen
+import com.example.jobjetv1.ui.view.loginscreen.ProfileInfoScreen
 import com.example.jobjetv1.ui.view.functionhomescreen.ApplicationScreen
 import com.example.jobjetv1.ui.view.functionhomescreen.ApplicationSuccessScreen
 import com.example.jobjetv1.ui.view.functionhomescreen.JobDetailScreen
@@ -20,7 +23,15 @@ import com.example.jobjetv1.ui.view.functionprofilescreen.EditAvatarScreen
 import com.example.jobjetv1.ui.view.functionprofilescreen.EditProfileScreen
 import com.example.jobjetv1.ui.view.functionprofilescreen.OtpChangePhoneScreen
 import com.example.jobjetv1.ui.view.functionprofilescreen.SavedJobsScreen
-import com.example.jobjetv1.viewmodel.*
+import com.example.jobjetv1.viewmodel.AuthViewModel
+import com.example.jobjetv1.viewmodel.HomeViewModel
+import com.example.jobjetv1.viewmodel.NotificationViewModel
+import com.example.jobjetv1.viewmodel.OtpViewModel
+import com.example.jobjetv1.viewmodel.ProfileViewModel
+import com.example.jobjetv1.viewmodel.ProfileInfoViewModel
+import com.example.jobjetv1.viewmodel.RecruitmentViewModel
+import com.example.jobjetv1.viewmodel.SavedJobsViewModel
+import com.example.jobjetv1.viewmodel.SearchViewModel
 import com.example.jobjetv1.ui.view.mainscreen.HomeScreen
 import com.example.jobjetv1.ui.view.mainscreen.NotificationScreen
 import com.example.jobjetv1.ui.view.mainscreen.ProfileScreen
@@ -66,7 +77,19 @@ fun AppNavHost() {
                     }
                 )
             }
-            composable("success") { SuccessScreen { navController.navigate("home") { popUpTo(0) } } }
+            composable("success") { SuccessScreen { navController.navigate("profile_info") { popUpTo(0) } } }
+            
+            composable("profile_info") {
+                val viewModel: ProfileInfoViewModel = viewModel()
+                ProfileInfoScreen(
+                    viewModel = viewModel,
+                    onProfileComplete = {
+                        navController.navigate("home") { 
+                            popUpTo(0)
+                        }
+                    }
+                )
+            }
             composable("home") {
                 HomeScreen(
                     viewModel = homeViewModel, // Sử dụng shared HomeViewModel
@@ -142,7 +165,9 @@ fun AppNavHost() {
                 )
             }
             composable("profile") {
+                val profileViewModel: ProfileViewModel = viewModel()
                 ProfileScreen(
+                    viewModel = profileViewModel,
                     savedJobsViewModel = savedJobsViewModel,
                     onEditProfile = { navController.navigate("edit_profile") },
                     onRecruitClick = { navController.navigate("recruitment_post") },
@@ -157,14 +182,13 @@ fun AppNavHost() {
                 )
             }
             composable("edit_profile") {
+                val profileViewModel: ProfileViewModel = viewModel()
                 EditProfileScreen(
+                    viewModel = profileViewModel,
                     onChangeAvatar = { navController.navigate("edit_avatar") },
                     onChangeNumberPhone = { navController.navigate("change_phone") },
                     onBack = { navController.popBackStack() },
-                    onDone = { navController.navigate("profile") },
-                    onDelete = { /* xử lý xoá hồ sơ */ },
-                    onFieldClick = { field ->
-                    }
+                    onDone = { navController.navigate("profile") }
                 )
             }
             composable("edit_avatar") {
