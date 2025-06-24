@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.jobjetv1.data.model.Job
 import com.example.jobjetv1.data.model.JobPostUiState
 import com.example.jobjetv1.R
+import com.google.firebase.Timestamp
 
 object JobsRepository {
     
@@ -15,11 +16,11 @@ object JobsRepository {
     private var nextJobId = 10 // Start from 10 since sample jobs use 1-9
     
     private fun initializeSampleJobs() = listOf(
-        Job("1", "Out Layer", "Global City Quận 9", "Setup, điều chỉnh sân khấu.", "50,000 VND/Giờ", Color(0xFF43A047), R.drawable.outline_tools_pliers_wire_stripper_24),
-        Job("2", "Kho Shoppe", "221/4 Phan Huy Ích, P14, Gò Vấp", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
-        Job("3", "Kho Shoppe", "618/1B Âu cơ, P10, Tân Bình", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
-        Job("4", "Nhà hàng", "202 Hoàng Văn Thụ, Phú Nhuận", "Phân loại bưu kiện, sắp xếp hàng hóa.", "25,000 VND/Giờ", Color(0xFF43A047), R.drawable.outline_restaurant_24),
-        Job("5", "Kho Shoppe", "123 Nguyễn Hữu Tiến, Tân Phú", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24),
+        Job("1", "Out Layer", "Global City Quận 9", "Setup, điều chỉnh sân khấu.", "50,000 VND/Giờ", Color(0xFF43A047), R.drawable.outline_tools_pliers_wire_stripper_24, postedDate = Timestamp.now()),
+        Job("2", "Kho Shoppe", "221/4 Phan Huy Ích, P14, Gò Vấp", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24, postedDate = Timestamp.now()),
+        Job("3", "Kho Shoppe", "618/1B Âu cơ, P10, Tân Bình", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24, postedDate = Timestamp.now()),
+        Job("4", "Nhà hàng", "202 Hoàng Văn Thụ, Phú Nhuận", "Phân loại bưu kiện, sắp xếp hàng hóa.", "25,000 VND/Giờ", Color(0xFF43A047), R.drawable.outline_restaurant_24, postedDate = Timestamp.now()),
+        Job("5", "Kho Shoppe", "123 Nguyễn Hữu Tiến, Tân Phú", "Phân loại bưu kiện, sắp xếp hàng hóa.", "31,250 VND/Giờ", Color(0xFF43A047), R.drawable.outline_warehouse_24, postedDate = Timestamp.now()),
     )
     
     /**
@@ -32,14 +33,15 @@ object JobsRepository {
             description = jobPost.description,
             wage = "${jobPost.wage} ${jobPost.wageUnit}",
             wageColor = Color(0xFF43A047), // Green color for new jobs
-            iconRes = getIconForJobType(jobPost.jobTitle) // Determine icon based on job title
+            iconRes = getIconForJobType(jobPost.jobTitle),
+            postedDate = Timestamp.now()
         )
-        
+
         // Add to beginning of list (newest jobs first)
         val oldCount = _allJobs.size
         _allJobs = listOf(newJob) + _allJobs
         nextJobId++
-        
+
         return newJob
     }
     
@@ -54,7 +56,8 @@ object JobsRepository {
             description = "This is a test job for debugging",
             wage = "30,000 VND/Giờ",
             wageColor = Color(0xFF43A047),
-            iconRes = R.drawable.outline_warehouse_24
+            iconRes = R.drawable.outline_warehouse_24,
+            postedDate = Timestamp.now()
         )
         
         val oldCount = _allJobs.size

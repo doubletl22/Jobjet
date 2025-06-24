@@ -6,61 +6,84 @@ import com.example.jobjetv1.data.model.Job
 import com.example.jobjetv1.repository.JobsRepositoryFirestore
 
 class HomeViewModel : ViewModel() {
-    
-    // Jobs từ repository - sử dụng derivedStateOf để Compose track thay đổi
-    val jobs: List<Job> by derivedStateOf { JobsRepositoryFirestore.allJobs }
-    
+
+    // --- SỬA LỖI: Bắt đầu ---
+    // 1. Tạo một thực thể (instance) của repository.
+    //    Lỗi "Unresolved reference" xảy ra vì bạn đang cố truy cập `allJobs`
+    //    từ tên class, nhưng nó là một thuộc tính của thực thể.
+    private val jobsRepository = JobsRepositoryFirestore()
+    // --- SỬA LỖI: Kết thúc ---
+
+    // Jobs từ repository - sử dụng thuộc tính của thực thể đã tạo.
+    // derivedStateOf rất hữu ích khi state của bạn được tính toán từ một hoặc nhiều state khác.
+    val jobs: List<Job> by derivedStateOf { jobsRepository.allJobs }
+
     /**
-     * Tìm kiếm jobs
+     * Tìm kiếm jobs dựa trên query.
+     * Hàm này sẽ lọc danh sách jobs hiện có trong `jobsRepository.allJobs`.
      */
     fun searchJobs(query: String): List<Job> {
-        // Implement search if needed, currently not implemented in Firestore repo
+        if (query.isBlank()) {
+            return jobs // Trả về tất cả jobs nếu query rỗng
+        }
         return jobs.filter { job ->
             job.title.contains(query, ignoreCase = true) ||
-            job.address.contains(query, ignoreCase = true) ||
-            job.description.contains(query, ignoreCase = true)
+                    job.address.contains(query, ignoreCase = true) ||
+                    job.description.contains(query, ignoreCase = true)
         }
     }
-    
+
     /**
-     * Lấy job theo ID
+     * Lấy job theo ID.
+     * --- SỬA LỖI: Sử dụng thực thể `jobsRepository` để gọi phương thức ---
      */
     fun getJobById(id: String): Job? {
-        return JobsRepositoryFirestore.getJobById(id)
+        return jobsRepository.getJobById(id)
     }
-    
+
     /**
-     * Refresh jobs (có thể dùng cho pull-to-refresh)
+     * Refresh jobs (không cần thiết với Firestore Listener).
+     * Firestore listener trong repository sẽ tự động cập nhật `allJobs`
+     * và Compose sẽ tự động nhận biết thay đổi.
+     * Bạn có thể giữ hàm này trống hoặc xóa nó đi.
      */
     fun refreshJobs() {
-        // Firestore updates automatically handled by listener
+        // Không cần implement gì ở đây vì Firestore đã xử lý real-time.
+        // Repository nên tự động cập nhật `allJobs` khi có thay đổi trên server.
     }
-    
+
+    // Các hàm dưới đây có thể hữu ích cho việc debug, không cần thay đổi.
     /**
-     * Force recomposition for debugging
+     * Lấy số lượng jobs hiện tại để debug.
      */
     fun getJobsCount(): Int = jobs.size
-    
+
     /**
-     * Debug function to get latest job
+     * Lấy job mới nhất để debug.
      */
     fun getLatestJob(): Job? = jobs.firstOrNull()
-    
+
     /**
-     * Observer để theo dõi khi jobs thay đổi
+     * Composable này không thực sự cần thiết vì UI sẽ tự động cập nhật
+     * khi `jobs` (là một State) thay đổi. Bạn có thể xóa nó đi.
      */
     @Composable
     fun ObserveJobsChanges() {
+        // LaunchedEffect sẽ được trigger mỗi khi jobs.size thay đổi.
+        // Tuy nhiên, vì `jobs` đã là một state được theo dõi bởi Compose,
+        // bất kỳ UI nào sử dụng nó sẽ tự động được recompose.
         LaunchedEffect(jobs.size) {
-            // Jobs count changed, UI will automatically update
+            println("Job count changed to: ${jobs.size}")
         }
     }
-    
+
     /**
-     * Test function để thêm job để test
+     * Hàm này nên được implement trong repository, không phải ViewModel.
+     * ViewModel không nên có logic tạo dữ liệu trực tiếp.
      */
-    fun addTestJob(): Job {
-        // Not implemented in Firestore repo
-        throw UnsupportedOperationException("addTestJob not supported in Firestore repository")
+    fun addTestJob() {
+        // Để thêm job mới, bạn nên gọi một phương thức trong repository, ví dụ:
+        // jobsRepository.addJob(newJob)
+        throw UnsupportedOperationException("addTestJob nên được xử lý bởi JobsRepositoryFirestore")
     }
 }
