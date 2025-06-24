@@ -21,39 +21,47 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import android.util.Log
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.jobjetv1.viewmodel.HomeViewModel
 import com.example.jobjetv1.viewmodel.SavedJobsViewModel
 import com.example.jobjetv1.data.model.Job
-import com.example.jobjetv1.R
-import com.example.jobjetv1.ui.theme.Blue
 import com.example.jobjetv1.ui.view.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    navController: NavController, // THÊM navController
     viewModel: HomeViewModel = viewModel(),
     savedJobsViewModel: SavedJobsViewModel? = null,
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
     onJobClick: (Job) -> Unit = {}
 ) {
-    var searchText by remember { mutableStateOf("") }
-    
-    // Observer jobs changes for debugging
-    viewModel.ObserveJobsChanges()
-    
-    // Reactive jobs list - sẽ tự động recompose khi jobs thay đổi
-    val allJobs by remember { derivedStateOf { viewModel.jobs } }
+    LaunchedEffect(Unit) {
+        viewModel.loadJobsFromFirebase()
+    }
 
-    val jobs = remember(allJobs, searchText) {
-        allJobs
-            .distinctBy { it.id } // <-- THÊM DÒNG NÀY ĐỂ XÓA TRÙNG LẶP
-            .filter {
-                it.title.contains(searchText, true) ||
-                        it.address.contains(searchText, true) ||
-                        it.description.contains(searchText, true)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val needReload = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<Boolean>("need_reload")
+    LaunchedEffect(needReload) {
+        needReload?.observe(lifecycleOwner) { shouldReload ->
+            if (shouldReload == true) {
+                viewModel.loadJobsFromFirebase()
+                navController.currentBackStackEntry?.savedStateHandle?.set("need_reload", false)
             }
+        }
+    }
+    val jobs by viewModel.jobs.collectAsState()
+
+    var searchText by remember { mutableStateOf("") }
+    val filteredJobs = jobs.filter {
+        it.jobTitle.contains(searchText, ignoreCase = true) ||
+                it.address.contains(searchText, ignoreCase = true) ||
+                it.description.contains(searchText, ignoreCase = true)
     }
 
     Scaffold(
@@ -77,28 +85,13 @@ fun HomeScreen(
         ) {
             item { // Thêm các phần tử không phải là item của danh sách vào đây
                 Spacer(Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    placeholder = { Text("Tìm kiếm công việc...") },
-                    leadingIcon = { Icon(painterResource(id = R.drawable.outline_search_24), null) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors( // Hoặc TextFieldDefaults nếu bạn đang dùng Material2
-                        focusedBorderColor = Blue,
-                        unfocusedBorderColor = Color.Gray,
-                        cursorColor = Blue,
-                        focusedLabelColor = Blue,     // Màu label khi TextField được focus
-                    )
-                )
-                Spacer(Modifier.height(16.dp))
-                Text("Việc làm gợi ý cho bạn (${jobs.size})", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Việc làm gợi ý cho bạn (${filteredJobs.size})", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
 
             // Sử dụng items để hiển thị danh sách Job
-            items(jobs, key = { it.id }) { job -> // Giả sử Job có thuộc tính 'id' duy nhất
+            items(filteredJobs, key = { it.id }) { job ->
                 JobCardM3(
-                    job = job, 
+                    job = job,
                     onJobClick = onJobClick,
                     savedJobsViewModel = savedJobsViewModel
                 )
@@ -113,7 +106,7 @@ fun HomeScreen(
 
 @Composable
 fun JobCardM3(
-    job: Job, 
+    job: Job,
     onJobClick: (Job) -> Unit = {},
     savedJobsViewModel: SavedJobsViewModel? = null
 ) {
@@ -147,7 +140,7 @@ fun JobCardM3(
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    job.title,
+                    job.jobTitle,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
@@ -169,16 +162,16 @@ fun JobCardM3(
                 Text(job.wage, color = job.wageColor, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             }
             Spacer(Modifier.width(8.dp))
-            
+
             // Nút Lưu việc làm
             savedJobsViewModel?.let { viewModel ->
                 val isJobSaved = viewModel.isJobSaved(job.id)
-                
+
                 // Debug log khi state thay đổi
                 LaunchedEffect(isJobSaved) {
                     Log.d("HomeScreen", "Job ${job.title} saved state changed to: $isJobSaved")
                 }
-                
+
                 IconButton(
                     onClick = {
                         Log.d("HomeScreen", "Save/Unsave clicked for job: ${job.title}")
@@ -198,11 +191,11 @@ fun JobCardM3(
                     )
                 }
             }
-            
+
             Spacer(Modifier.width(4.dp))
-            
+
             Button(
-                onClick = { 
+                onClick = {
                     // Ngăn việc click lan ra JobCard khi click button
                     // Xử lý đăng ký việc ở đây
                 },

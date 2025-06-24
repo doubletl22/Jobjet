@@ -92,8 +92,9 @@ fun AppNavHost() {
             }
             composable("home") {
                 HomeScreen(
-                    viewModel = homeViewModel, // Sử dụng shared HomeViewModel
-                    savedJobsViewModel = savedJobsViewModel, // Truyền SavedJobsViewModel
+                    navController = navController,          // TRUYỀN navController
+                    viewModel = homeViewModel,              // Shared HomeViewModel
+                    savedJobsViewModel = savedJobsViewModel,
                     selectedTab = 0,
                     onTabSelected = {
                         when (it) {
@@ -248,13 +249,9 @@ fun AppNavHost() {
             }
             composable("recruitment_post") {
                 RecruitmentPostScreen(
-                    onBack = { navController.popBackStack() },
-                    onSubmit = { submittedJobPost ->
-                        // Navigate to success screen sau khi thêm job thành công
-                        navController.navigate("recruitment_success/${submittedJobPost.jobTitle}") {
-                            popUpTo("profile") { inclusive = false }
-                        }
-                    }
+                    navController = navController,  // TRUYỀN navController (bắt buộc)
+                    onBack = { navController.popBackStack() }
+                    // KHÔNG CẦN onSubmit nữa vì đã popBack và reload ở RecruitmentPostScreen
                 )
             }
             composable("recruitment_success/{jobTitle}") { backStackEntry ->

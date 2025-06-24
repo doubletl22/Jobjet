@@ -182,7 +182,7 @@ fun JobHeaderCard(job: Job) {
             
             // Job title
             Text(
-                text = job.title,
+                text = job.jobTitle,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center

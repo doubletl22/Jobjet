@@ -35,7 +35,61 @@ data class SearchUiState(
 class SearchViewModel : ViewModel() {
 
     private val jobsRepository = JobsRepository
+// ... Other imports and code remain the same
 
+    private fun filterJobs(jobs: List<Job>): List<Job> {
+        return jobs.filter { job ->
+            val matchesSearchText = if (searchText.isBlank()) {
+                true
+            } else {
+                job.title.contains(searchText, ignoreCase = true) ||
+                        job.company.contains(searchText, ignoreCase = true) ||
+                        job.location.contains(searchText, ignoreCase = true) ||
+                        job.description.contains(searchText, ignoreCase = true)
+            }
+
+            val matchesCategory = if (searchFilters.category.isEmpty() || searchFilters.category == "Tất cả") {
+                true
+            } else {
+                job.category == searchFilters.category
+            }
+
+            val matchesLocation = if (searchFilters.location.isEmpty() || searchFilters.location == "Tất cả") {
+                true
+            } else {
+                job.location.contains(searchFilters.location, ignoreCase = true)
+            }
+
+            val matchesJobType = if (searchFilters.jobType.isEmpty() || searchFilters.jobType == "Tất cả") {
+                true
+            } else {
+                job.workType.contains(searchFilters.jobType, ignoreCase = true)
+            }
+
+            // Only include workTime filter if Job has workTime property
+            val matchesWorkTime = if (searchFilters.workTime.isEmpty() || searchFilters.workTime == "Tất cả") {
+                true
+            } else {
+                job.workTime?.contains(searchFilters.workTime, ignoreCase = true) ?: true // Handle null
+            }
+
+            val matchesSalary = if (searchFilters.minSalary.isEmpty() && searchFilters.maxSalary.isEmpty()) {
+                true
+            } else {
+                try {
+                    val jobSalary = extractSalaryFromString(job.salary)
+                    val minSal = searchFilters.minSalary.toIntOrNull() ?: 0
+                    val maxSal = searchFilters.maxSalary.toIntOrNull() ?: Int.MAX_VALUE
+                    jobSalary in minSal..maxSal
+                } catch (e: Exception) {
+                    true
+                }
+            }
+
+            matchesSearchText && matchesCategory && matchesLocation &&
+                    matchesJobType && matchesWorkTime && matchesSalary
+        }
+    }
     // UI State
     var searchText by mutableStateOf("")
         private set
@@ -226,65 +280,6 @@ class SearchViewModel : ViewModel() {
                     errorMessage = "Có lỗi xảy ra khi tìm kiếm: ${e.message}"
                 )
             }
-        }
-    }
-
-    private fun filterJobs(jobs: List<Job>): List<Job> {
-        return jobs.filter { job ->
-            // Filter by search text
-            val matchesSearchText = if (searchText.isBlank()) {
-                true
-            } else {
-                job.title.contains(searchText, ignoreCase = true) ||
-                        job.company.contains(searchText, ignoreCase = true) ||
-                        job.location.contains(searchText, ignoreCase = true) ||
-                        job.description.contains(searchText, ignoreCase = true)
-            }
-
-            // Filter by category
-            val matchesCategory = if (searchFilters.category.isEmpty() || searchFilters.category == "Tất cả") {
-                true
-            } else {
-                job.category == searchFilters.category
-            }
-
-            // Filter by location
-            val matchesLocation = if (searchFilters.location.isEmpty() || searchFilters.location == "Tất cả") {
-                true
-            } else {
-                job.location.contains(searchFilters.location, ignoreCase = true)
-            }
-
-            // Filter by job type
-            val matchesJobType = if (searchFilters.jobType.isEmpty() || searchFilters.jobType == "Tất cả") {
-                true
-            } else {
-                job.workType.contains(searchFilters.jobType, ignoreCase = true)
-            }
-
-            // Filter by work time
-            val matchesWorkTime = if (searchFilters.workTime.isEmpty() || searchFilters.workTime == "Tất cả") {
-                true
-            } else {
-                job.workTime.contains(searchFilters.workTime, ignoreCase = true)
-            }
-
-            // Filter by salary range
-            val matchesSalary = if (searchFilters.minSalary.isEmpty() && searchFilters.maxSalary.isEmpty()) {
-                true
-            } else {
-                try {
-                    val jobSalary = extractSalaryFromString(job.salary)
-                    val minSal = searchFilters.minSalary.toIntOrNull() ?: 0
-                    val maxSal = searchFilters.maxSalary.toIntOrNull() ?: Int.MAX_VALUE
-                    jobSalary in minSal..maxSal
-                } catch (e: Exception) {
-                    true // If can't parse salary, include the job
-                }
-            }
-
-            matchesSearchText && matchesCategory && matchesLocation &&
-                    matchesJobType && matchesWorkTime && matchesSalary
         }
     }
 

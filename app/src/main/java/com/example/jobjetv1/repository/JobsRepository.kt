@@ -8,7 +8,14 @@ import com.example.jobjetv1.R
 import com.google.firebase.Timestamp
 
 object JobsRepository {
-    
+
+    object JobsRepository {
+        val allJobs: List<Job> = listOf() // Replace with Firestore or mock data
+
+        fun getJobById(id: String): Job? {
+            return allJobs.find { it.id == id }
+        }
+    }
     // Sử dụng mutableStateOf để Compose có thể reactive
     private var _allJobs by mutableStateOf(initializeSampleJobs())
     val allJobs: List<Job> get() = _allJobs

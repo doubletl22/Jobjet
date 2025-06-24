@@ -25,6 +25,7 @@ import com.example.jobjetv1.R
 import com.example.jobjetv1.data.model.JobPostUiState
 import com.example.jobjetv1.data.model.WorkType
 import com.example.jobjetv1.viewmodel.RecruitmentViewModel
+import androidx.navigation.NavController // THÊM IMPORT NÀY
 
 // --- Constants for better maintainability and consistency ---
 private val ScreenPadding = 16.dp
@@ -41,6 +42,7 @@ private val ScreenBackground = Color(0xFFF6F8FA)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecruitmentPostScreen(
+    navController: NavController, // SỬA: thêm tham số này
     viewModel: RecruitmentViewModel = viewModel(),
     onBack: () -> Unit = {},
     onSubmit: (JobPostUiState) -> Unit = {}
@@ -241,7 +243,12 @@ fun RecruitmentPostScreen(
                     viewModel.validateAndSubmit(
                         onSuccess = { jobPost ->
                             Log.d("RecruitmentPostScreen", "Job submitted successfully: ${jobPost.jobTitle}")
-                            onSubmit(jobPost)
+                            // --- BẮT ĐẦU ĐOẠN SỬA ĐỔI ---
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("need_reload", true)
+                            navController.popBackStack()
+                            // --- KẾT THÚC ĐOẠN SỬA ĐỔI ---
                         },
                         onError = { error ->
                             Log.d("RecruitmentPostScreen", "Job submission failed: $error")

@@ -28,6 +28,7 @@ data class Job(
     val contactName: String = "",
     val contactEmail: String = "",
     val contactPhone: String = "",
+    val workTime: String? = null,
     val postedDate: Timestamp = Timestamp.now(),
 
     // --- Các trường để hiển thị & tương thích với dữ liệu cũ (Legacy) ---

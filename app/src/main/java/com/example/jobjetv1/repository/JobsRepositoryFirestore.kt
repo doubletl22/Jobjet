@@ -10,11 +10,18 @@ object JobsRepositoryFirestore {
 
     private val jobsCollection = FirebaseFirestore.getInstance().collection("jobs")
 
-    /**
-     * Hàm này nhận state từ UI, chuyển đổi nó thành đối tượng Job,
-     * và lưu vào Firestore.
-     * @return Đối tượng Job đã được tạo thành công, hoặc null nếu có lỗi.
-     */
+    suspend fun getAllJobs(): List<Job> {
+        return try {
+            jobsCollection.get().await().documents.mapNotNull { doc ->
+                doc.toObject(Job::class.java)
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepo", "Error getting all jobs", e)
+            emptyList()
+        }
+    }
+
+
     suspend fun addJobFromPost(jobPostState: JobPostUiState): Job? {
         return try {
             // Tạo một document mới để lấy ID duy nhất
