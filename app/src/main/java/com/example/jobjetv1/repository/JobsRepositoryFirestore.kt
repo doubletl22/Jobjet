@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.jobjetv1.data.model.Job
 import com.example.jobjetv1.data.model.JobPostUiState
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.tasks.await
 
 object JobsRepositoryFirestore {
@@ -28,8 +29,30 @@ object JobsRepositoryFirestore {
             val newJobDocument = jobsCollection.document()
             val jobId = newJobDocument.id
 
-            // Chuyển đổi từ JobPostUiState sang đối tượng Job
-            val newJob = Job(
+            // Tạo một đối tượng Map chỉ chứa các trường sẽ được lưu vào Firestore
+            val jobData = hashMapOf(
+                "id" to jobId,
+                "companyName" to jobPostState.companyName,
+                "jobTitle" to jobPostState.jobTitle,
+                "description" to jobPostState.description,
+                "requirement" to jobPostState.requirement,
+                "address" to jobPostState.address,
+                "wage" to "${jobPostState.wage} ${jobPostState.wageUnit}",
+                "quantity" to (jobPostState.quantity.toIntOrNull() ?: 0),
+                "workType" to jobPostState.workType.name,
+                "contactName" to jobPostState.contactName,
+                "contactEmail" to jobPostState.contactEmail,
+                "contactPhone" to jobPostState.contactPhone,
+                "postedDate" to Timestamp.now()
+                // Các trường chỉ dành cho UI như iconRes và wageColor sẽ không được lưu
+            )
+
+            // Lưu đối tượng Map vào Firestore và đợi hoàn thành
+            newJobDocument.set(jobData).await()
+            Log.d("FirestoreRepo", "Job added successfully with ID: $jobId")
+
+            // Trả về đối tượng Job đầy đủ để sử dụng ngay lập tức (với các giá trị UI mặc định)
+            Job(
                 id = jobId,
                 companyName = jobPostState.companyName,
                 jobTitle = jobPostState.jobTitle,
@@ -42,14 +65,7 @@ object JobsRepositoryFirestore {
                 contactName = jobPostState.contactName,
                 contactEmail = jobPostState.contactEmail,
                 contactPhone = jobPostState.contactPhone
-                // postedDate sẽ lấy thời gian hiện tại theo giá trị mặc định
             )
-
-            // Lưu vào Firestore và đợi hoàn thành
-            newJobDocument.set(newJob).await()
-            Log.d("FirestoreRepo", "Job added successfully with ID: $jobId")
-
-            newJob // Trả về đối tượng Job vừa tạo
 
         } catch (e: Exception) {
             Log.e("FirestoreRepo", "Error adding job to Firestore", e)

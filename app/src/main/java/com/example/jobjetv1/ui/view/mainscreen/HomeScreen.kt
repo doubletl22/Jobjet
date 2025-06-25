@@ -40,7 +40,7 @@ fun HomeScreen(
     onJobClick: (Job) -> Unit = {}
 ) {
     LaunchedEffect(Unit) {
-        viewModel.loadJobsFromFirebase()
+        viewModel.loadJobs()
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -50,7 +50,7 @@ fun HomeScreen(
     LaunchedEffect(needReload) {
         needReload?.observe(lifecycleOwner) { shouldReload ->
             if (shouldReload == true) {
-                viewModel.loadJobsFromFirebase()
+                viewModel.loadJobs()
                 navController.currentBackStackEntry?.savedStateHandle?.set("need_reload", false)
             }
         }
