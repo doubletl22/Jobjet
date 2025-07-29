@@ -7,7 +7,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import android.util.Log
 import com.example.jobjetv1.data.model.JobPostUiState
-import com.example.jobjetv1.repository.JobsRepositoryFirestore
 
 data class ValidationState(
     val companyNameError: String? = null,

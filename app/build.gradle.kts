@@ -52,34 +52,23 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
     implementation(libs.play.services.auth)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.dagger:hilt-android:2.56.2")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation ("com.google.firebase:firebase-auth-ktx")
     implementation("androidx.compose.material3:material3:1.3.2")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.4-beta")
     implementation("com.google.accompanist:accompanist-permissions:0.31.4-beta")
-
-
-    implementation(platform(libs.firebase.bom))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore-ktx") // Thư viện Firestore
-    implementation("com.google.firebase:firebase-storage-ktx")
-    
-    // Date/Time picker cho ứng tuyển
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
-    // Icons extended
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

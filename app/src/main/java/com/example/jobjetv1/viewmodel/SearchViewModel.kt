@@ -20,7 +20,7 @@ data class SearchFilters(
     val jobType: String = "",
     val category: String = "",
     val workTime: String = "",
-    val sortBy: String = "newest" // newest, salary_high, salary_low
+    val sortBy: String = "newest" 
 )
 
 data class SearchUiState(
