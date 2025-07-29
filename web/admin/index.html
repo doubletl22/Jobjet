@@ -252,6 +252,65 @@
                     link.classList.add('sidebar-link-active');
                 }
             });
+
+            const API_BASE_URL = 'http://localhost:8080/api/admin'; // Thay đổi nếu cần
+
+        // Lấy dữ liệu người dùng
+        function fetchUsers() {
+            fetch(`${API_BASE_URL}/users`)
+                .then(response => response.json())
+                .then(users => {
+                    const userTableBody = document.querySelector('#users tbody');
+                    userTableBody.innerHTML = ''; // Xóa dữ liệu cũ
+                    users.forEach(user => {
+                        const row = `
+                            <tr>
+                                <td class="w-1/3 text-left py-3 px-4">${user.displayName}</td>
+                                <td class="w-1/3 text-left py-3 px-4">${user.email}</td>
+                                <td class="text-left py-3 px-4"><span class="bg-blue-200 text-blue-800 py-1 px-3 rounded-full text-xs">${user.role}</span></td>
+                                <td class="text-left py-3 px-4">
+                                    <button class="text-blue-500 hover:text-blue-700">Xem</button>
+                                    <button class="text-red-500 hover:text-red-700 ml-2">Tạm khóa</button>
+                                </td>
+                            </tr>`;
+                        userTableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error('Lỗi khi tải danh sách người dùng:', error));
+        }
+
+        // Lấy dữ liệu việc làm
+        function fetchJobs() {
+            fetch(`${API_BASE_URL}/jobs`)
+                .then(response => response.json())
+                .then(jobs => {
+                     const jobTableBody = document.querySelector('#jobs tbody');
+                     jobTableBody.innerHTML = ''; // Xóa dữ liệu cũ
+                     jobs.forEach(job => {
+                        const statusClass = job.status === 'Đã duyệt' ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800';
+                        const row = `
+                            <tr>
+                                <td class="w-2/5 text-left py-3 px-4">${job.title}</td>
+                                <td class="w-2/5 text-left py-3 px-4">${job.company}</td>
+                                <td class="text-left py-3 px-4"><span class="${statusClass} py-1 px-3 rounded-full text-xs">${job.status}</span></td>
+                                <td class="text-left py-3 px-4">
+                                     <button class="text-blue-500 hover:text-blue-700">Xem</button>
+                                     <button class="text-red-500 hover:text-red-700 ml-2">Gỡ</button>
+                                 </td>
+                            </tr>`;
+                        jobTableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error('Lỗi khi tải danh sách việc làm:', error));
+        }
+
+
+        // Gọi hàm fetch khi trang được tải
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchUsers();
+            fetchJobs();
+            // Fetch các dữ liệu khác tương tự
+        });
         }
 
         // TODO: Viết code để fetch dữ liệu từ API Spring Boot và điền vào các bảng
